@@ -1,15 +1,13 @@
 package solver.row
 
 private fun Boolean.toInt() = if (this) 1 else 0
-
+const val alphabet = 26
 class Row() {
-    override fun toString() = "${words.size}\n" + words.joinToString("\n") { it.toString() }
     class Word() {
         val size: Int get() = letters.size
         override fun toString(): String {
             return letters.joinToString(" ") { it.toString() }
         }
-
         /**
          * The constructor supposes there are only ?[^].ABC in regex
          */
@@ -60,25 +58,28 @@ class Row() {
 
         class Letter(var chars: UInt = 0u) {
             override fun toString() =
-                (0 until 26).filter { (1u shl it) and chars != 0u }.map { 'A' + it }.joinToString("")
-
+                (0 until alphabet).filter { (1u shl it) and chars != 0u }.map { 'A' + it }.joinToString("")
             var number: Int = 0
-            fun setAll() {
-                chars = (1u shl 26) - 1u
-            }
 
+            fun setAll() {
+                chars = (1u shl alphabet) - 1u
+            }
             operator fun set(p: Int, b: Boolean) {
                 chars = if (b) chars or (1u shl p) else chars and (1u shl p).inv()
             }
 
             fun clone() = Letter(chars)
+
         }
 
         val subExprs = mutableListOf<SubExpr>()
+
         val letters = mutableListOf<Letter>()
     }
 
-    val words = mutableListOf<Word>()
+    override fun toString() = "${words.size}\n" + words.joinToString("\n") { it.toString() }
+
+    private val words = mutableListOf<Word>()
 
     fun setChars(allowed: UInt, idx: Int): Boolean {
         var changed = false
