@@ -26,7 +26,7 @@ open class BaseFigure {
 
     fun process(cell: Cell): Boolean {
         var progress = false
-        var result = 1u shl alphabet - 1
+        var result = (1u shl alphabet) - 1u
         for (dir in Dir.values()) {
             val pos = transpose(dir, cell)
             result = result and regexps[dir.ordinal][pos.row].charOr(pos.col)
