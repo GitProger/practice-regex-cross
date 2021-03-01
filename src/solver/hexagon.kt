@@ -5,6 +5,7 @@ import java.io.File
 
 import solver.row.*
 
+@ExperimentalUnsignedTypes
 open class Hexagon(private val size: Int) {
     var regexps = MutableList(3) { MutableList(size * 2 - 1) { Row() } }
     var board = MutableList(size * 2 - 1) { i ->

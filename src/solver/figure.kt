@@ -6,7 +6,7 @@ import java.io.File
 import solver.row.*
 
 open class BaseFigure {
-	abstract enum class Dir {}
+    abstract enum class Dir {}
     data class Cell(var row: Int = 0, var col: Int = 0)
 
     var regexps = mutableListOf<MutableList<Row>>()

@@ -5,7 +5,8 @@ import java.io.File
 
 import solver.row.*
 
-open class Rectangle(var height: Int, var width: Int) {
+@ExperimentalUnsignedTypes
+open class Rectangle(val height: Int, val width: Int) {
     var regexps = MutableList(2) {
         MutableList(if (it == 0) height else width) { Row() } 
     }

@@ -2,6 +2,8 @@ package solver.row
 
 private fun Boolean.toInt() = if (this) 1 else 0
 const val alphabet = 26
+
+@ExperimentalUnsignedTypes
 class Row() {
     class Word() {
         val size: Int get() = letters.size
@@ -271,8 +273,8 @@ class Row() {
         }
 
         fun fromRegex(regex: String, required_size: Int): Row {
-            dp = MutableList(required_size + 1) { MutableList(regex.length + 1) { null } }
-            last = MutableList(regex.length + 1) { null }
+            dp = MutableList(required_size + 1) { MutableList<Row?>(regex.length + 1) { null } }
+            last = MutableList<Row?>(regex.length + 1) { null }
             return getFromRegex(regex, regex.lastIndex, required_size)
         }
 
