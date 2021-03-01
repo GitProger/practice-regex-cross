@@ -27,12 +27,12 @@ open class Rectangle(var height: Int, var width: Int) {
     fun process(cell: Cell): Boolean {
         var progress = false
         var result = 1u shl alphabet - 1
-        for (dir in listOf(Dir.RIGHT, Dir.DOWN)) {
+        for (dir in Dir.values()) {
             val pos = transpose(dir, cell)
             result = result and regexps[dir.ordinal][pos.row].charOr(pos.col)
         }
 
-        for (dir in listOf(Dir.RIGHT, Dir.DOWN)) {
+        for (dir in Dir.values()) {
             val pos = transpose(dir, cell)
             progress = progress or regexps[dir.ordinal][pos.row].setChars(result, pos.col)
         }
