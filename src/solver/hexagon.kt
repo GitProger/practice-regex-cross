@@ -1,18 +1,18 @@
 package solver.hexagon
 
+import solver.row.*
 import kotlin.math.*
 import java.io.File
+import java.lang.StringBuilder
+import java.util.*
 
-import solver.row.*
-
-@ExperimentalUnsignedTypes
 open class Hexagon(private val size: Int) {
     var regexps = MutableList(3) { MutableList(size * 2 - 1) { Row() } }
     var board = MutableList(size * 2 - 1) { i ->
         MutableList(minOf(size + i, 3 * size - 2 - i)) { '?' }
     }
 
-    enum class Dir { RIGHT, LEFT_UP, LEFT_DOWN }
+    enum class Dir { RIGHT, LEFT_DOWN, LEFT_UP }
     data class Cell(var row: Int = 0, var col: Int = 0)
 
     private fun rowSize(row: Int) = board[row].size
@@ -21,26 +21,35 @@ open class Hexagon(private val size: Int) {
         var progress = true
         while (progress) {
             progress = false
-            for (i in 0 until board.size)
-                for (j in 0 until rowSize(i))
-                    progress = process(Cell(i, j)) || progress
+            for (i in 0 until board.size) {
+                for (j in 0 until rowSize(i)) {
+                    progress = progress or process(Cell(i, j))
+                }
+            }
         }
     }
 
-    fun process(cell: Cell): Boolean {
+    private fun process(cell: Cell): Boolean {
         var progress = false
-        var result = (1u shl alphabet) - 1u
-        for (dir in Dir.values()) {
+        val result = BitSet()
+        result.setAll()
+        for (dir in listOf(Dir.RIGHT, Dir.LEFT_UP, Dir.LEFT_DOWN)) {
             val pos = transpose(dir, cell)
-            result = result and regexps[dir.ordinal][pos.row].charOr(pos.col)
+            val charOr = regexps[dir.ordinal][pos.row].charOr(pos.col)
+            result.and(charOr)
         }
-
-        for (dir in Dir.values()) {
+        if (result.cardinality() == 0) {
+            throw IllegalStateException("""The crossword doesn't have any solution.
+This position has been determined so far:
+$this
+Letter at row ${cell.row} and column ${cell.col} can't be found.""")
+        }
+        for (dir in listOf(Dir.RIGHT, Dir.LEFT_UP, Dir.LEFT_DOWN)) {
             val pos = transpose(dir, cell)
             progress = progress or regexps[dir.ordinal][pos.row].setChars(result, pos.col)
         }
-        if (result.toString(2).count { it == '1' } == 1)
-            board[cell.row][cell.col] = 'A' + result.toString(2).let { it.lastIndex - it.indexOf('1') }
+        if (result.cardinality() == 1)
+            board[cell.row][cell.col] = char(result.nextSetBit(0))
         return progress
     }
 
@@ -72,18 +81,20 @@ open class Hexagon(private val size: Int) {
             }
     }
 
-    fun putToFile(fileName: String) {
-        val result = File(fileName)
-        result.writeText("")
+    override fun toString(): String {
+        val result = StringBuilder()
         val longest = 4 * size - 3
         for (i in 0 until board.size) {
             val spaces = (longest - (2 * rowSize(i) - 1)) / 2
             val text = " ".repeat(spaces) +
                     (0 until rowSize(i)).toList()
-                        .map { board[i][it].toString() }
-                        .joinToString(" ") +
+                            .map { board[i][it] }
+                            .joinToString(" ") +
                     "\n"
-            result.appendText(text)
+            result.append(text)
         }
+        return result.toString()
     }
+
+    fun putToFile(fileName: String) = File(fileName).writeText(toString())
 }

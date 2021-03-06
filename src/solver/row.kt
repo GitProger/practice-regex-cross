@@ -1,20 +1,21 @@
 package solver.row
 
+import java.util.*
+
 private fun Boolean.toInt() = if (this) 1 else 0
 const val alphabet = 26
+fun BitSet.setAll() = set(0, alphabet)
+fun isLetter(c: Char) = c in 'A'..'Z'
+fun ordinal(c: Char) = c - 'A'
+fun char(ord: Int) = 'A' + ord
 
-@ExperimentalUnsignedTypes
 class Row() {
     class Word() {
-        val size: Int get() = letters.size
-        override fun toString(): String {
-            return letters.joinToString(" ") { it.toString() }
-        }
         /**
          * The constructor supposes there are only ?[^].ABC in regex
          */
-        constructor(regex: String, l: Int, r: Int, qMask: UInt) : this() {
-            val skip = regex.indices.filter { regex[it] == '?' }.filterIndexed { q, _ -> qMask and (1u shl q) != 0u }
+        constructor(regex: String, l: Int, r: Int, qMask: Int) : this() {
+            val skip = regex.indices.filter { regex[it] == '?' }.filterIndexed { q, _ -> qMask and (1 shl q) != 0 }
             var i = l - 1
             while (++i <= r) {
                 if (i + 1 <= r && regex[i + 1] == '?' && (i + 1) in skip) continue
@@ -26,67 +27,53 @@ class Row() {
                     i = curR - 1
                     continue
                 }
-                letters.add(Letter())
-                if (regex[i] == '.') {
-                    letters.last().setAll()
-                } else {
-                    letters.last()[regex[i] - 'A'] = true
+                letters.add(BitSet())
+                when {
+                    regex[i] == '.' -> letters.last().setAll()
+                    isLetter(regex[i]) -> letters.last()[ordinal(regex[i])] = true
+                    else -> throw IllegalStateException("Regex $regex isn't correct. Letter ${regex[i]} doesn't belong to range A..Z")
                 }
             }
-        }
-
-        fun clone(): Word {
-            val clone = Word()
-            for (expr in subExprs) clone.subExprs.add(expr)
-            for (i in letters.indices) letters[i].number = -1
-            var cntDistinct = 0
-            for (letter in letters) if (letter.number == -1) letter.number = cntDistinct++
-            val memory = MutableList<Letter?>(cntDistinct) { null }
-            for (i in 0 until size) {
-                val letter = memory[letters[i].number]
-                if (letter != null) {
-                    clone.letters.add(letter)
-                } else {
-                    clone.letters.add(letters[i].clone())
-                    memory[letters[i].number] = clone.letters[i]
-                }
-            }
-            return clone
         }
 
         class SubExpr(val l: Int, val r: Int) {
             val size: Int get() = r - l + 1
         }
 
-        class Letter(var chars: UInt = 0u) {
-            override fun toString() =
-                (0 until alphabet).filter { (1u shl it) and chars != 0u }.map { 'A' + it }.joinToString("")
-            var number: Int = 0
-
-            fun setAll() {
-                chars = (1u shl alphabet) - 1u
-            }
-            operator fun set(p: Int, b: Boolean) {
-                chars = if (b) chars or (1u shl p) else chars and (1u shl p).inv()
-            }
-
-            fun clone() = Letter(chars)
-
-        }
-
         val subExprs = mutableListOf<SubExpr>()
 
-        val letters = mutableListOf<Letter>()
+        val letters = mutableListOf<BitSet>()
+
+        val size: Int get() = letters.size
+
+        override fun toString(): String {
+            return letters.joinToString(" ") { it.stream().toArray().map { char(it) }.joinToString("") }
+        }
+
+        fun clone(): Word {
+            val clone = Word()
+            for (subExpr in subExprs) clone.subExprs.add(subExpr)
+            char@ for (i in 0 until size) {
+                for (j in 0 until i) {
+                    if (letters[i] === letters[j]) {
+                        clone.letters.add(clone.letters[j])
+                        continue@char
+                    }
+                }
+                clone.letters.add(letters[i].clone() as BitSet)
+            }
+            return clone
+        }
     }
 
     override fun toString() = "${words.size}\n" + words.joinToString("\n") { it.toString() }
 
     private val words = mutableListOf<Word>()
 
-    fun setChars(allowed: UInt, idx: Int): Boolean {
+    fun setChars(allowed: BitSet, idx: Int): Boolean {
         var changed = false
-        for (word in words) changed = changed || (word.letters[idx].chars != allowed)
-        for (word in words) word.letters[idx].chars = word.letters[idx].chars and allowed
+        for (word in words) changed = changed || (word.letters[idx] != allowed)
+        for (word in words) word.letters[idx].and(allowed)
         clean()
         return changed
     }
@@ -113,21 +100,21 @@ class Row() {
                 for (letter in row.words[j].letters) {
                     result.words.last().letters.add(letter)
                 }
-                for (sub_expr in row.words[j].subExprs) {
-                    result.words.last().subExprs.add(Word.SubExpr(sub_expr.l + leftSize, sub_expr.r + leftSize))
+                for (subExpr in row.words[j].subExprs) {
+                    result.words.last().subExprs.add(Word.SubExpr(subExpr.l + leftSize, subExpr.r + leftSize))
                 }
             }
         }
         return result
     }
 
-    private fun clean() = words.removeAll { word -> word.letters.any { letter -> letter.chars == 0u } }
+    private fun clean() = words.removeAll { word -> word.letters.any { letter -> letter.isEmpty } }
 
-    fun charOr(idx: Int) = words.fold(0u) { acc, word -> acc or word.letters[idx].chars }
+    fun charOr(idx: Int) = BitSet().apply { words.onEach { word -> or(word.letters[idx]) } }
 
     fun distinctLengths() = List(words.size) { words[it].size }.sorted().distinct()
 
-    companion object Getter{
+    companion object Getter {
         private var dp = mutableListOf<MutableList<Row?>>()
         private var last = mutableListOf<Row?>()
 
@@ -157,12 +144,15 @@ class Row() {
         private fun getFromBrackets(regex: String, l: Int, r: Int): Word {
             assert(regex[l] == '[')
             val word = Word()
-            word.letters.add(Word.Letter())
+            word.letters.add(BitSet())
             val invert = regex[l + 1] == '^'
             if (invert) word.letters[0].setAll()
             for (i in (l + invert.toInt() + 1)..r) {
                 if (regex[i] == ']') return word.also { assert(i == r) }
-                word.letters[0][regex[i] - 'A'] = !invert
+                if (!isLetter(regex[i])) {
+                    throw IllegalStateException("Regex $regex isn't correct. Letter ${regex[i]} doesn't belong to range A..Z")
+                }
+                word.letters[0][ordinal(regex[i])] = !invert
             }
             throw IllegalStateException("Regex $regex doesn't contain pair for opening bracket at $l")
         }
@@ -172,7 +162,7 @@ class Row() {
             val result = Row()
             for (len in lengths) {
                 result.words.addAll(
-                    getFromRegex(regex, r, required_size - len).multiplyConcatenatedWith(row, required_size).words
+                        getFromRegex(regex, r, required_size - len).multiplyConcatenatedWith(row, required_size).words
                 )
             }
             return result
@@ -225,13 +215,14 @@ class Row() {
         }
 
         private fun getConcatenated(regex: String, r: Int, group: Int, required_size: Int): Row {
-            fun ending(ord: Int) = when(ord) {
+            fun ending(ord: Int) = when (ord) {
                 1 -> "st"
                 2 -> "nd"
                 else -> "th"
             }
+
             val groupL = regex.indices.filter { regex[it] == '(' }.getOrNull(group - 1)
-                ?: throw IllegalStateException("Regex $regex doesn't contain ${group}${ending(group)} group in parentheses")
+                    ?: throw IllegalStateException("Regex $regex doesn't contain ${group}${ending(group)} group in parentheses")
             val groupR = findClose(regex, groupL)
             val temp = getFromParentheses(regex, groupL, groupR)
             val lengths = temp.distinctLengths()
@@ -261,7 +252,10 @@ class Row() {
             var curL = l + 1
             for (i in l + 1..r) {
                 if (regex[i] == '|' || regex[i] == ')') {
-                    for (mask in 0u until (1u shl regex.slice(curL until i).count { it == '?' })) {
+                    if (regex.slice(curL until i).count { it == '?' } > 15) {
+                        throw IllegalStateException("Regex $regex is too complicated")
+                    }
+                    for (mask in 0 until (1 shl regex.slice(curL until i).count { it == '?' })) {
                         row.words.add(Word(regex, curL, i - 1, mask))
                         row.words.last().subExprs.add(Word.SubExpr(0, row.words.last().size - 1))
                     }
@@ -273,9 +267,10 @@ class Row() {
         }
 
         fun fromRegex(regex: String, required_size: Int): Row {
-            dp = MutableList(required_size + 1) { MutableList<Row?>(regex.length + 1) { null } }
-            last = MutableList<Row?>(regex.length + 1) { null }
-            return getFromRegex(regex, regex.lastIndex, required_size)
+            dp = MutableList(required_size + 1) { MutableList(regex.length + 1) { null } }
+            last = MutableList(regex.length + 1) { null }
+            val ans = getFromRegex(regex, regex.lastIndex, required_size)
+            return ans
         }
 
         private fun getLast(regex: String, l: Int, r: Int): Row {
@@ -283,7 +278,7 @@ class Row() {
             last[r] = when {
                 regex[l] == '[' -> Row(getFromBrackets(regex, l, r))
                 regex[l] == '(' -> getFromParentheses(regex, l, r)
-                else -> Row(Word(regex, l, r, 0u))
+                else -> Row(Word(regex, l, r, 0))
             }
             return last[r]!!
         }
