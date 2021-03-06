@@ -1,11 +1,11 @@
 package solver.rectangle
 
+import solver.row.*
 import kotlin.math.*
 import java.io.File
+import java.lang.StringBuilder
+import java.util.*
 
-import solver.row.*
-
-@ExperimentalUnsignedTypes
 open class Rectangle(val height: Int, val width: Int) {
     var regexps = MutableList(2) {
         MutableList(if (it == 0) height else width) { Row() } 
@@ -25,22 +25,30 @@ open class Rectangle(val height: Int, val width: Int) {
         }
     }
 
-    fun process(cell: Cell): Boolean {
+    private fun process(cell: Cell): Boolean {
         var progress = false
-        var result = (1u shl alphabet) - 1u
+        val result = BitSet()
+        result.setAll()
         for (dir in Dir.values()) {
             val pos = transpose(dir, cell)
-            result = result and regexps[dir.ordinal][pos.row].charOr(pos.col)
+            val charOr = regexps[dir.ordinal][pos.row].charOr(pos.col)
+            result.and(charOr)
         }
-
+        if (result.cardinality() == 0) {
+            throw IllegalStateException("""The crossword doesn't have any solution.
+This position has been determined so far:
+$this
+Letter at row ${cell.row} and column ${cell.col} can't be found.""")
+        }
         for (dir in Dir.values()) {
             val pos = transpose(dir, cell)
             progress = progress or regexps[dir.ordinal][pos.row].setChars(result, pos.col)
         }
-        if (result.toString(2).count { it == '1' } == 1)
-            board[cell.row][cell.col] = 'A' + result.toString(2).let { it.lastIndex - it.indexOf('1') }
+        if (result.cardinality() == 1)
+            board[cell.row][cell.col] = char(result.nextSetBit(0))
         return progress
     }
+
 
     private fun transpose(dir: Dir, cell: Cell) = when (dir) {
         Dir.RIGHT -> cell

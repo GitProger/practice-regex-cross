@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+kotlinc mainSolver.kt row.kt hexagon.kt rectangle.kt -include-runtime -d main.jar
+
+if [[ $1 == "-r" && $? == 0 ]]; then
+    kotlin main.jar
+fi
+

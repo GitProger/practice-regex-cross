@@ -267,8 +267,8 @@ class Row() {
         }
 
         fun fromRegex(regex: String, required_size: Int): Row {
-            dp = MutableList(required_size + 1) { MutableList(regex.length + 1) { null } }
-            last = MutableList(regex.length + 1) { null }
+            dp = MutableList<MutableList<Row?>>(required_size + 1) { MutableList(regex.length + 1) { null } }
+            last = MutableList<Row?>(regex.length + 1) { null }
             val ans = getFromRegex(regex, regex.lastIndex, required_size)
             return ans
         }

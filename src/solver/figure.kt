@@ -42,7 +42,6 @@ open class BaseFigure {
     }
 
     open protected abstract fun transpose(dir: Dir, cell: Cell)
-    open abstract fun putToFile(fileName: String)
 
     fun readFromFile(fileName: String) {
         val lines = mutableListOf<String>()
@@ -56,5 +55,7 @@ open class BaseFigure {
                 regexps[i][j] = Row.fromRegex(regex, board[j].size)
             }
     }
+
+    fun putToFile(fileName: String) = File(fileName).writeText(toString())
 }
 
