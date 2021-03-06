@@ -1,14 +1,14 @@
 import solver.hexagon.*
 import solver.rectangle.*
+import solver.row.*
 import java.io.File
-
-// kotlinc mainSolver.kt row.kt hexagon.kt rectangle.kt -include-runtime -d main.jar
 
 @ExperimentalUnsignedTypes
 fun main() {
-    val fig = Rectangle(2, 3) // Hexagon(7)
+	print("Enter size (A)x(B) -> ")
+	val (h, w) = readLine()!!.split(" ").map { it.toInt() }
+    val fig = Rectangle(h, w)
     fig.readFromFile("sample_rect.txt")
     fig.solve()
-    fig.putToFile("result.txt")
-    println(File("result.txt").readText())
+    println(fig)
 }

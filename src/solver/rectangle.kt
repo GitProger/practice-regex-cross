@@ -60,13 +60,15 @@ open class Rectangle(val height: Int, val width: Int) {
             }
     }
 
-    fun putToFile(fileName: String) {
-        val result = File(fileName)
-        result.writeText("")
+    override fun toString(): String {
+        var s = ""
         for (i in 0 until height) {
-            val text = " " + (0 until width).toList()
+            val text = (0 until width).toList()
                      .map { board[i][it].toString() }.joinToString(" ") + "\n"
-            result.appendText(text)
+            s += text
         }
+        return s
     }
+
+    fun putToFile(fileName: String) = File(fileName).writeText(toString())
 }
