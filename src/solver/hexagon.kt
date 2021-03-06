@@ -33,7 +33,7 @@ open class Hexagon(private val size: Int) {
         var progress = false
         val result = BitSet()
         result.setAll()
-        for (dir in listOf(Dir.RIGHT, Dir.LEFT_UP, Dir.LEFT_DOWN)) {
+        for (dir in Dir.values()) {
             val pos = transpose(dir, cell)
             val charOr = regexps[dir.ordinal][pos.row].charOr(pos.col)
             result.and(charOr)
@@ -44,7 +44,7 @@ This position has been determined so far:
 $this
 Letter at row ${cell.row} and column ${cell.col} can't be found.""")
         }
-        for (dir in listOf(Dir.RIGHT, Dir.LEFT_UP, Dir.LEFT_DOWN)) {
+        for (dir in Dir.values()) {
             val pos = transpose(dir, cell)
             progress = progress or regexps[dir.ordinal][pos.row].setChars(result, pos.col)
         }
@@ -74,7 +74,7 @@ Letter at row ${cell.row} and column ${cell.col} can't be found.""")
             if (it.isNotBlank()) lines.add(it.trim())
         }
         var curStr = 0
-        for (i in 0..2)
+        for (i in Dir.values().indices)
             for (j in 0 until regexps[i].size) {
                 val regex = lines[curStr++]
                 regexps[i][j] = Row.fromRegex(regex, board[j].size)
