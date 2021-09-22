@@ -1,0 +1,10 @@
+2 2
+A.
+[BCD]X
+
+.[CZ]
+R.
+
+# ARFF
+# CDCD
+# XUUT
