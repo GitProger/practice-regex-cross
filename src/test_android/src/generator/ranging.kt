@@ -14,22 +14,30 @@ package generator.ranging
 import kotlin.text.*
 
 class DifferentStringLengthException(public val message : String) : Exception(message)
-
-object PatternRegexes {
-    val progress = "-" // ?
-    val repeats = "((.)\\2+)"
-    val palindrome = "/((.)(?1)\\2|.?)/"
-    val word = "-" // ?
-}
-
-object PatternCost { // насколько приятно увидеть в строке что-то из этого
-    val progress = 1
-    val repeats = 3
-    val palindrome = 6
-    val word = 7
-}
-
 enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
+
+fun getCost(p: PatternType) = when(p) {
+    PatternType.PROGRESS -> 1
+    PatternType.REPEATS -> 3
+    PatternType.PALINDROME -> 6
+    PatternType.WORD -> 7
+}
+
+fun searcherGen(p: PatternType) = when(p) {
+        PatternType.PROGRESS -> fun (s: String) {
+
+        }
+        PatternType.PALINDROME -> fun (s: String) {
+//            s.findAll("/((.)(?1)\\2|.?)/".toRegex())
+        }
+        PatternType.REPEATS -> fun (s: String) { // "((.)\\2+)"
+
+        }
+        PatternType.WORD -> fun (s: String) {
+
+        }
+    }
+
 
 data class Pattern(public val length: Int, public val type: PatternType)
 
@@ -43,6 +51,7 @@ data class Pattern(public val length: Int, public val type: PatternType)
 
 class PatternSearcher(val s: String) {
     val patterns = mutableListOf<Pattern>()
+
 
 }
 
