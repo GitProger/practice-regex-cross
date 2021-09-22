@@ -80,3 +80,9 @@ Letter at row ${cell.row} and column ${cell.col} can't be found.""")
 
     fun putToFile(fileName: String) = File(fileName).writeText(toString())
 }
+
+class PseudoEnum(public val vals: List<String>, public val value: String) {
+    val ordinal = vals.indexOf(value)
+    fun key(k: String) = PseudoEnum(vals, k)
+    fun values() = vals.map { key(it) }
+}

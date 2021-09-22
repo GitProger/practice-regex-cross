@@ -4,7 +4,8 @@ import solver.row.*
 import java.io.File
 
 fun main() {
-	val type = "h"
+	print("r - rect, h - hex> ")
+	val type = readLine()!!
 	if (type == "r") {
         print("Enter size (A)x(B) -> ")
         val (h, w) = readLine()!!.split(" ").map { it.toInt() }
