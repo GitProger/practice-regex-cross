@@ -64,3 +64,4 @@ class Goodness(public val length : Int, public val rank : Int) {
     }
     // a < b ==> a.compareTo(b) < 0
 }
+
