@@ -16,6 +16,9 @@ import kotlin.text.*
 class DifferentStringLengthException(public val message : String) : Exception(message)
 enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
+data class Pattern(public val length: Int, public val type: PatternType, public val str: String)
+
+
 fun getCost(p: PatternType) = when(p) {
     PatternType.PROGRESS -> 1
     PatternType.REPEATS -> 3
@@ -24,23 +27,19 @@ fun getCost(p: PatternType) = when(p) {
 }
 
 fun searcherGen(p: PatternType) = when(p) {
-        PatternType.PROGRESS -> fun (s: String) {
+        PatternType.PROGRESS -> fun (s: String): List<Pattern> {
 
         }
-        PatternType.PALINDROME -> fun (s: String) {
+        PatternType.PALINDROME -> fun (s: String): List<Pattern> {
 //            s.findAll("/((.)(?1)\\2|.?)/".toRegex())
         }
-        PatternType.REPEATS -> fun (s: String) { // "((.)\\2+)"
+        PatternType.REPEATS -> fun (s: String): List<Pattern> { // "((.)\\2+)"
 
         }
-        PatternType.WORD -> fun (s: String) {
+        PatternType.WORD -> fun (s: String): List<Pattern> {
 
         }
     }
-
-
-data class Pattern(public val length: Int, public val type: PatternType)
-
 
 /**
  *  хорошесть также должна зависеть от длины паттерна,
@@ -50,9 +49,8 @@ data class Pattern(public val length: Int, public val type: PatternType)
  */
 
 class PatternSearcher(val s: String) {
-    val patterns = mutableListOf<Pattern>()
-
-
+    var patterns = PatternType.values().flatMap { searcherGen(it)(s) }
+    public fun all() = patterns.sumBy { getCost(it.type) }
 }
 
 class Goodness(public val length : Int, public val rank : Int) {
