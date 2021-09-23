@@ -48,13 +48,10 @@ fun searcherGen(p: PatternType) = when(p) {
  *  минимальная длина паттерна - 2 символа, максимальная - n
  */
 
-class PatternSearcher(val s: String) {
-    var patterns = PatternType.values().flatMap { searcherGen(it)(s) }
-    public fun all() = patterns.sumBy { getCost(it.type) }
-}
+fun getRank(s: String) = PatternType.values().flatMap { searcherGen(it)(s) }.sumBy { getCost(it.type) }
 
 class Goodness(public val length : Int, public val rank : Int) {
-    constructor(val s: String) : this(s.length, PatternSearcher(s).all()) {}
+    constructor(val s: String) : this(s.length, getRank(s)) {}
 
     fun compareTo(val g : Goodness): Int {
         if (length != g.length) throw DifferentStringLengthException()
