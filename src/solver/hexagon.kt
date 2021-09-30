@@ -19,6 +19,9 @@ open class Hexagon(private val size: Int) {
         return indices.map { board[it.row][it.col] }.joinToString("")
     }
 
+    val MAX_TEMPERATURE = 100_000
+    val AVERAGE_COST: Double = ...
+
     fun generateBoard(chars: List<Char>) {
         board.forEach { row -> row.indices.forEach { row[it] = chars.random() } }
         // simulated annealing
@@ -28,7 +31,10 @@ open class Hexagon(private val size: Int) {
             val prevCost = Dir.values().sumOf { estimateCost(getLine(it, cell)) }
             board[cell.row][cell.col] = chars.random()
             val curCost = Dir.values().sumOf { estimateCost(getLine(it, cell)) }
-            if (curCost > prevCost && exp(-(curCost - prevCost).toDouble() / temperature) < Math.random()) {
+
+            //the probability definition should probably be changed
+            val probability = exp(-(curCost - prevCost) / AVERAGE_COST * MAX_TEMPERATURE / 2 / temperature)
+            if (curCost > prevCost && probability < Math.random()) {
                 // revert changes
                 board[cell.row][cell.col] = prevChar
             }
