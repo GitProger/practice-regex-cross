@@ -1,5 +1,7 @@
 import kotlin.math.*
 
-fun main() {	
-    println("Test...")	
+object Main {
+    fun main() {
+
+    }
 }

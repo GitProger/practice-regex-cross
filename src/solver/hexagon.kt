@@ -12,10 +12,41 @@ open class Hexagon(private val size: Int) {
         MutableList(minOf(size + i, 3 * size - 2 - i)) { '?' }
     }
 
+    private fun getLine(dir: Dir, cell: Cell): String {
+        val row = transpose(dir, cell).row
+        val transposedIndices = board[row].indices
+        val indices = transposedIndices.map { transposeInverse(dir, Cell(row, it)) }
+        return indices.map { board[it.row][it.col] }.joinToString("")
+    }
+
+    fun generateBoard(chars: List<Char>) {
+        board.forEach { row -> row.indices.forEach { row[it] = chars.random() } }
+        // simulated annealing
+        for (temperature in MAX_TEMPERATURE downTo 1) {
+            val cell = board.indices.random().let { row -> Cell(row, board[row].indices.random()) }
+            val prevChar = board[cell.row][cell.col]
+            val prevCost = Dir.values().sumOf { estimateCost(getLine(it, cell)) }
+            board[cell.row][cell.col] = chars.random()
+            val curCost = Dir.values().sumOf { estimateCost(getLine(it, cell)) }
+            if (curCost > prevCost && exp(-(curCost - prevCost).toDouble() / temperature) < Math.random()) {
+                // revert changes
+                board[cell.row][cell.col] = prevChar
+            }
+        }
+    }
+
     enum class Dir { RIGHT, LEFT_DOWN, LEFT_UP }
     data class Cell(var row: Int = 0, var col: Int = 0)
 
     private fun rowSize(row: Int) = board[row].size
+
+    private fun transposeInverse(dir: Dir, cell: Cell) = transpose(
+        when (dir) {
+            Dir.RIGHT -> Dir.RIGHT
+            Dir.LEFT_UP -> Dir.LEFT_DOWN
+            Dir.LEFT_DOWN -> Dir.LEFT_UP
+        }, cell
+    )
 
     fun solve() {
         var progress = true
