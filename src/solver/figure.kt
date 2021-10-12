@@ -1,6 +1,6 @@
 package solver.figure
 
-import kotlin.math.*
+/* import kotlin.math.*
 import java.io.File
 
 import solver.row.*
@@ -59,3 +59,4 @@ open class BaseFigure {
     fun putToFile(fileName: String) = File(fileName).writeText(toString())
 }
 
+*/

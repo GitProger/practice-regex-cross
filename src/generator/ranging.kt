@@ -1,5 +1,7 @@
 package generator.ranging
+
 import java.io.File
+
 /**
  * Файл реализует получение "хорошести" строки
  * Что же такое "хорошесть"?
@@ -17,7 +19,8 @@ import java.io.File
  */
 
 enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
-fun getCost(p: PatternType) = when(p) {
+
+fun getCost(p: PatternType) = when (p) {
     PatternType.PROGRESS -> 1
     PatternType.REPEATS -> 3
     PatternType.PALINDROME -> 6
@@ -31,9 +34,7 @@ fun getCost(p: PatternType) = when(p) {
  *  минимальная длина паттерна - 2 символа, максимальная - n
  */
 
-fun isProgression(s: String): Boolean {
-
-}
+fun isProgression(s: String): Boolean = false
 
 fun isPalindrome(s: String): Boolean {
     val n = s.length
@@ -44,17 +45,21 @@ fun isPalindrome(s: String): Boolean {
 
 fun doesRepeat(s: String): Boolean {
     val n = s.length
-    for (periodLen in 1 .. n / 2) {
+    for (periodLen in 1..n / 2) {
         val period = s.subSequence(0, periodLen)
-        if (s.findAll(period).sumBy { it.length } == n)
+        if (n % periodLen == 0 &&
+            (s.indices step periodLen).all { s.subSequence(it, it + periodLen) == period }
+        )
             return true
     }
     return false
 }
 
-fun inDict(s: String) = (s in File("db/dict.txt").bufferedReader().readLines())
+val dictionary = File("src/generator/db/dict.txt").bufferedReader().readLines()
 
-fun corresponds(pattern: String, p: PatternType) = when(p) {
+fun inDict(s: String) = s in dictionary
+
+fun corresponds(pattern: String, p: PatternType) = when (p) {
     PatternType.PROGRESS -> {
         isProgression(pattern)
     }
@@ -76,11 +81,11 @@ fun cost(pattern: String, p: PatternType): Int {
 
 fun estimateCost(s: String): Int {
     val n = s.length
-    val dp = MutableList<Int>(n) {0}
+    val dp = MutableList<Int>(n) { 0 }
     for (i in 0 until n) {
         for (j in 0 until i) {
             for (p in PatternType.values()) {
-                dp[i] = max(dp[i], dp[j] + cost(s.subSequence(j, i + 1), p))
+                dp[i] = maxOf(dp[i], dp[j] + cost(s.subSequence(j, i + 1).toString(), p))
             }
         }
     }

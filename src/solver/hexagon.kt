@@ -12,33 +12,11 @@ open class Hexagon(private val size: Int) {
         MutableList(minOf(size + i, 3 * size - 2 - i)) { '?' }
     }
 
-    private fun getLine(dir: Dir, cell: Cell): String {
+    fun getLine(dir: Dir, cell: Cell): String {
         val row = transpose(dir, cell).row
         val transposedIndices = board[row].indices
         val indices = transposedIndices.map { transposeInverse(dir, Cell(row, it)) }
         return indices.map { board[it.row][it.col] }.joinToString("")
-    }
-
-    val MAX_TEMPERATURE = 100_000
-    val AVERAGE_COST: Double = ...
-
-    fun generateBoard(chars: List<Char>) {
-        board.forEach { row -> row.indices.forEach { row[it] = chars.random() } }
-        // simulated annealing
-        for (temperature in MAX_TEMPERATURE downTo 1) {
-            val cell = board.indices.random().let { row -> Cell(row, board[row].indices.random()) }
-            val prevChar = board[cell.row][cell.col]
-            val prevCost = Dir.values().sumOf { estimateCost(getLine(it, cell)) }
-            board[cell.row][cell.col] = chars.random()
-            val curCost = Dir.values().sumOf { estimateCost(getLine(it, cell)) }
-
-            //the probability definition should probably be changed
-            val probability = exp(-(curCost - prevCost) / AVERAGE_COST * MAX_TEMPERATURE / 2 / temperature)
-            if (curCost > prevCost && probability < Math.random()) {
-                // revert changes
-                board[cell.row][cell.col] = prevChar
-            }
-        }
     }
 
     enum class Dir { RIGHT, LEFT_DOWN, LEFT_UP }
