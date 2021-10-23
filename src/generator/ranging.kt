@@ -1,7 +1,7 @@
 package generator.ranging
 
 import java.io.File
-
+import kotlin.math.*
 /**
  * Файл реализует получение "хорошести" строки
  * Что же такое "хорошесть"?
@@ -20,11 +20,19 @@ import java.io.File
 
 enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
-fun getCost(p: PatternType) = when (p) {
-    PatternType.PROGRESS -> 1
-    PatternType.REPEATS -> 3
-    PatternType.PALINDROME -> 6
-    PatternType.WORD -> 7
+fun getCost(p: PatternType, len: Int) = when (p) {
+    PatternType.PROGRESS -> {
+		0
+	}
+    PatternType.REPEATS -> {
+		0
+	}
+    PatternType.PALINDROME -> {
+		0
+	}
+    PatternType.WORD -> {
+		len * len
+	}
 }
 
 /**
@@ -76,7 +84,7 @@ fun corresponds(pattern: String, p: PatternType) = when (p) {
 
 fun cost(pattern: String, p: PatternType): Int {
     if (!corresponds(pattern, p)) return 0
-    return pattern.length * getCost(p)
+    return getCost(p, pattern.length)
 }
 
 fun estimateCost(s: String): Int {
