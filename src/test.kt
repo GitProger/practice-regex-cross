@@ -1,11 +1,11 @@
 import generator.generateBoard
-import solver.Hexagon
-import solver.Rectangle
+import solver.hexagon.*
+import solver.rectangle.*
 
 fun main() {
     println("Do you want to solve any crossword or to create one?")
     print("s - solve, g - generate >")
-    when ("g") {
+    when (readLine()!!.trim()) {
         "s" -> solve()
         "g" -> generate()
     }
@@ -13,15 +13,15 @@ fun main() {
 
 fun generate(){
     print("r - rect, h - hex >")
-    if (false) {
+    val type = readLine()!!
+    if (type == "r") {
         TODO("Not implemented yet")
     } else {
         print("Enter crossword size: ")
-        val size = 5
+        val size = readLine()!!.toInt()
         val h = Hexagon(size)
         generateBoard(h, "ABCDEFGHRT".toList())
         h.putToFile("src/solver/result.txt")
-        println()
         println(h)
     }
 }

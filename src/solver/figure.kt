@@ -1,16 +1,17 @@
-package solver.figure
+package solver
 
-/* import kotlin.math.*
 import java.io.File
 
 import solver.row.*
+import java.util.*
 
-open class BaseFigure {
-    abstract enum class Dir {}
+abstract class BaseFigure {
+    abstract val directions: List<String>
+
     data class Cell(var row: Int = 0, var col: Int = 0)
 
-    var regexps = mutableListOf<MutableList<Row>>()
-    var board = mutableListOf<MutableList<Char>>()
+    abstract var regexps: MutableList<MutableList<Row>>
+    abstract var board: MutableList<MutableList<Char>>
 
     protected fun rowSize(row: Int) = board[row].size
 
@@ -24,24 +25,33 @@ open class BaseFigure {
         }
     }
 
-    fun process(cell: Cell): Boolean {
+    private fun process(cell: Cell): Boolean {
         var progress = false
-        var result = (1u shl alphabet) - 1u
-        for (dir in Dir.values()) {
-            val pos = transpose(dir, cell)
-            result = result and regexps[dir.ordinal][pos.row].charOr(pos.col)
+        val result = BitSet()
+        result.setAll()
+        for (i in directions.indices) {
+            val pos = transpose(directions[i], cell)
+            val charOr = regexps[i][pos.row].charOr(pos.col)
+            result.and(charOr)
         }
-
-        for (dir in Dir.values()) {
-            val pos = transpose(dir, cell)
-            progress = progress or regexps[dir.ordinal][pos.row].setChars(result, pos.col)
+        if (result.cardinality() == 0) {
+            throw IllegalStateException(
+                """The crossword doesn't have any solution.
+This position has been determined so far:
+$this
+Letter at row ${cell.row} and column ${cell.col} can't be found."""
+            )
         }
-        if (result.toString(2).count { it == '1' } == 1)
-            board[cell.row][cell.col] = 'A' + result.toString(2).let { it.lastIndex - it.indexOf('1') }
+        for (i in directions.indices) {
+            val pos = transpose(directions[i], cell)
+            progress = progress or regexps[i][pos.row].setChars(result, pos.col)
+        }
+        if (result.cardinality() == 1)
+            board[cell.row][cell.col] = char(result.nextSetBit(0))
         return progress
     }
 
-    open protected abstract fun transpose(dir: Dir, cell: Cell)
+    protected abstract fun transpose(dir: String, cell: Cell): Cell
 
     fun readFromFile(fileName: String) {
         val lines = mutableListOf<String>()
@@ -59,4 +69,10 @@ open class BaseFigure {
     fun putToFile(fileName: String) = File(fileName).writeText(toString())
 }
 
+/*
+class PseudoEnum(public val vals: List<String>, public val value: String) {
+    val ordinal = vals.indexOf(value)
+    fun key(k: String) = PseudoEnum(vals, k)
+    fun values() = vals.map { key(it) }
+}
 */
