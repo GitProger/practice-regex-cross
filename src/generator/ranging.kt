@@ -3,8 +3,9 @@ package generator.ranging
 import java.io.File
 import kotlin.math.*
 
-fun Int.pow(p: Double): Int = pow(this.toDouble(), p).toInt()
-
+fun Int.pow(p: Double): Int {
+    return this.toDouble().pow(p).toInt()
+}
 /**
  * Файл реализует получение "хорошести" строки
  * Что же такое "хорошесть"?
@@ -25,7 +26,7 @@ enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
 fun getCost(p: PatternType, pattern: String) = when (p) {
     PatternType.PROGRESS -> {
-        3 * pattern.length.pow(1.5).toInt()
+        3 * pattern.length.pow(1.5)
     }
     PatternType.REPEATS -> {
         var count = 0
@@ -39,13 +40,13 @@ fun getCost(p: PatternType, pattern: String) = when (p) {
                 break
             }
         }
-        2 * count.pow(1.5).toInt()
+        2 * count.pow(1.5)
     }
     PatternType.PALINDROME -> {
-        3 * pattern.length.pow(1.5).toInt()
+        3 * pattern.length.pow(1.5)
     }
     PatternType.WORD -> {
-		pattern.length.pow(2).toInt()
+		pattern.length.pow(2.0)
 	}
 }
 
