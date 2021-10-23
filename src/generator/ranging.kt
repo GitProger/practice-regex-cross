@@ -3,7 +3,7 @@ package generator.ranging
 import java.io.File
 import kotlin.math.*
 
-fun Int.pow(p: Double) = pow(this.toDouble(), p).toInt()
+fun Int.pow(p: Double): Int = pow(this.toDouble(), p).toInt()
 
 /**
  * Файл реализует получение "хорошести" строки
@@ -29,12 +29,12 @@ fun getCost(p: PatternType, pattern: String) = when (p) {
     }
     PatternType.REPEATS -> {
         var count = 0
-        val n = s.length
+        val n = pattern.length
         for (periodLen in 1..n / 2) {
-            val period = s.subSequence(0, periodLen)
-            if (n % periodLen == 0 &&
-                (s.indices step periodLen).all { s.subSequence(it, it + periodLen) == period }
-            ) {
+            val period = pattern.subSequence(0, periodLen)
+            if (n % periodLen == 0 && (pattern.indices step periodLen).all { 
+                pattern.subSequence(it, it + periodLen) == period 
+            }) {
                 count = n / periodLen
                 break
             }
