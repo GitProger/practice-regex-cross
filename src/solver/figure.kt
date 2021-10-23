@@ -15,6 +15,8 @@ abstract class BaseFigure {
 
     protected fun rowSize(row: Int) = board[row].size
 
+    abstract fun getLine(cell: Cell, dir: String): String
+
     fun solve() {
         var progress = true
         while (progress) {

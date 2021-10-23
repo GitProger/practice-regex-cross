@@ -15,7 +15,12 @@ fun generate() {
     print("r - rect, h - hex >")
     val type = readLine()!!
     if (type == "r") {
-        TODO("Not implemented yet")
+        print("Enter crossword height and width: ")
+        val (h, w) = readLine()!!.split(' ').map { it.toInt() }
+        val r = Rectangle(h, w)
+        generateBoard(r, "ABCDEFGHRT".toList())
+        r.putToFile("src/solver/result.txt")
+        println(r)
     } else {
         print("Enter crossword size: ")
         val size = readLine()!!.toInt()

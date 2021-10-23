@@ -13,7 +13,7 @@ class Hexagon(private val size: Int) : BaseFigure() {
     }
     override val directions = listOf("LEFT_UP", "RIGHT", "LEFT_DOWN")
 
-    fun getLine(dir: String, cell: Cell): String {
+    override fun getLine(cell: Cell, dir: String): String {
         val row = transpose(dir, cell).row
         val transposedIndices = board[row].indices
         val indices = transposedIndices.map { transposeInverse(dir, Cell(row, it)) }
