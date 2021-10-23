@@ -22,7 +22,7 @@ enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
 fun getCost(p: PatternType, pattern: String) = when (p) {
     PatternType.PROGRESS -> {
-        3 * pow(count, 1.5).toInt()
+        3 * power(count, 1.5).toInt()
     }
     PatternType.REPEATS -> {
         var count = 0
@@ -36,13 +36,13 @@ fun getCost(p: PatternType, pattern: String) = when (p) {
                 break
             }
         }
-        2 * pow(count, 1.5).toInt()
+        2 * power(count, 1.5).toInt()
     }
     PatternType.PALINDROME -> {
-        3 * pow(pattern.length, 1.5).toInt()
+        3 * power(pattern.length, 1.5).toInt()
     }
     PatternType.WORD -> {
-		pow(pattern.length, 2).toInt()
+		power(pattern.length, 2).toInt()
 	}
 }
 
