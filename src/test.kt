@@ -11,7 +11,7 @@ fun main() {
     }
 }
 
-fun generate(){
+fun generate() {
     print("r - rect, h - hex >")
     val type = readLine()!!
     if (type == "r") {
