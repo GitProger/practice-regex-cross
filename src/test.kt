@@ -19,14 +19,12 @@ fun generate() {
         val (h, w) = readLine()!!.split(' ').map { it.toInt() }
         val r = Rectangle(h, w)
         generateBoard(r, ('A'..'Z').toList())
-        r.putToFile("src/solver/result.txt")
         println(r)
     } else if (type == "h") {
         print("Enter crossword size: ")
         val size = readLine()!!.toInt()
         val h = Hexagon(size)
         generateBoard(h, ('A'..'Z').toList())
-        h.putToFile("src/solver/result.txt")
         println(h)
     }
 }
