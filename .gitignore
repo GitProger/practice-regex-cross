@@ -1,4 +1,5 @@
 # IntelliJ project files
+src/solver/result.txt
 .idea
 *.iml
 out

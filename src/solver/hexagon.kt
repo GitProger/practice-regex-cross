@@ -11,6 +11,7 @@ class Hexagon(private val size: Int) : BaseFigure() {
     override var board = MutableList(size * 2 - 1) { i ->
         MutableList(minOf(size + i, 3 * size - 2 - i)) { '?' }
     }
+
     override val directions = listOf("LEFT_UP", "RIGHT", "LEFT_DOWN")
 
     override fun getLine(cell: Cell, dir: String): String {
