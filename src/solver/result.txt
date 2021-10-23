@@ -1,3 +1,3 @@
-A C B C
-F B D G
-R E A F
+D G C A
+E R E A
+F H F G

@@ -22,14 +22,14 @@ enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
 fun getCost(p: PatternType, len: Int) = when (p) {
     PatternType.PROGRESS -> {
-		0
-	}
+        0
+    }
     PatternType.REPEATS -> {
-		0
-	}
+        0
+    }
     PatternType.PALINDROME -> {
-		0
-	}
+        0
+    }
     PatternType.WORD -> {
 		len * len
 	}
