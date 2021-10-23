@@ -20,18 +20,29 @@ import kotlin.math.*
 
 enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
-fun getCost(p: PatternType, len: Int) = when (p) {
+fun getCost(p: PatternType, pattern: String) = when (p) {
     PatternType.PROGRESS -> {
-        0
+        3 * pow(count, 1.5).toInt()
     }
     PatternType.REPEATS -> {
-        0
+        var count = 0
+        val n = s.length
+        for (periodLen in 1..n / 2) {
+            val period = s.subSequence(0, periodLen)
+            if (n % periodLen == 0 &&
+                (s.indices step periodLen).all { s.subSequence(it, it + periodLen) == period }
+            ) {
+                count = n / periodLen
+                break
+            }
+        }
+        2 * pow(count, 1.5).toInt()
     }
     PatternType.PALINDROME -> {
-        0
+        3 * pow(pattern.length, 1.5).toInt()
     }
     PatternType.WORD -> {
-		len * len
+		pow(pattern.length, 2).toInt()
 	}
 }
 
@@ -42,7 +53,19 @@ fun getCost(p: PatternType, len: Int) = when (p) {
  *  минимальная длина паттерна - 2 символа, максимальная - n
  */
 
-fun isProgression(s: String): Boolean = false
+fun isProgression(s: String): Boolean {
+    // ABC AXBXCX XAXBXC  CBA - no
+    val ok = MutableList(2) { true }
+    for (shift in 1 .. 2) {
+        var prev = 'A'
+        for (i in 0 until s.length step shift) {
+            if (i > 0 && s[i] - prev != 1)
+                ok[shift - 1] = false
+            prev = s[i]
+        }
+    }
+    return ok[0] || ok[1]
+}
 
 fun isPalindrome(s: String): Boolean {
     val n = s.length
@@ -84,7 +107,7 @@ fun corresponds(pattern: String, p: PatternType) = when (p) {
 
 fun cost(pattern: String, p: PatternType): Int {
     if (!corresponds(pattern, p)) return 0
-    return getCost(p, pattern.length)
+    return getCost(p, pattern)
 }
 
 fun estimateCost(s: String): Int {
