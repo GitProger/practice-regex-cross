@@ -3,6 +3,7 @@ package generator
 import generator.ranging.estimateCost
 import solver.BaseFigure
 import solver.BaseFigure.Cell
+import java.lang.Math.random
 import kotlin.math.*
 
 const val MAX_TEMPERATURE = 10_000
@@ -19,9 +20,9 @@ fun generateBoard(f: BaseFigure, chars: List<Char>) {
         board[cell.row][cell.col] = chars.random()
         val newCost = f.directions.sumOf { estimateCost(f.getLine(cell, it)) }
 
-        if (oldCost < newCost) continue
+        val probability = exp(-(oldCost - newCost) / Q * temperature)
+        if (oldCost < newCost || probability < random()) continue
         //the probability definition should probably be changed
-        val probability = exp(-(oldCost - newCost) * Q / temperature)
         // revert changes
         board[cell.row][cell.col] = prevChar
     }

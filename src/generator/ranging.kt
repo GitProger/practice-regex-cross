@@ -45,7 +45,7 @@ fun getCost(p: PatternType, pattern: String) = when (p) {
         0
     }
     PatternType.PALINDROME -> {
-        3 * pattern.length.pow(1.5)
+        3 * pattern.length.pow(2.0)
     }
     PatternType.WORD -> {
 		pattern.length.pow(2.0)
@@ -74,12 +74,7 @@ fun isProgression(s: String): Boolean {
     return ok[0] || ok[1]
 }
 
-fun isPalindrome(s: String): Boolean {
-    val n = s.length
-    val mid1 = s.subSequence(0, n / 2)
-    val mid2 = s.subSequence(n - n / 2, n)
-    return mid1 == mid2.reversed()
-}
+fun isPalindrome(s: String) = s == s.reversed()
 
 fun doesRepeat(s: String): Boolean {
     val n = s.length
