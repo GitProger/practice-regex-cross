@@ -1,9 +1,9 @@
 package solver.rectangle
 
-import solver.BaseFigure
+import solver.Figure
 import solver.row.*
 
-class Rectangle(private val height: Int, private val width: Int): BaseFigure() {
+class Rectangle(private val height: Int, private val width: Int): Figure() {
     override var regexps = MutableList(2) {
         MutableList(if (it == 0) height else width) { Row() } 
     }

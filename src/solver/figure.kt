@@ -5,7 +5,7 @@ import java.io.File
 import solver.row.*
 import java.util.*
 
-abstract class BaseFigure {
+abstract class Figure {
     abstract val directions: List<String>
 
     data class Cell(var row: Int = 0, var col: Int = 0)

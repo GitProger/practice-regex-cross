@@ -1,12 +1,12 @@
 package solver.hexagon
 
-import solver.BaseFigure
+import solver.Figure
 import solver.row.*
 import kotlin.math.*
 import java.lang.IllegalArgumentException
 import java.lang.StringBuilder
 
-class Hexagon(private val size: Int) : BaseFigure() {
+class Hexagon(private val size: Int) : Figure() {
     override var regexps = MutableList(3) { MutableList(size * 2 - 1) { Row() } }
     override var board = MutableList(size * 2 - 1) { i ->
         MutableList(minOf(size + i, 3 * size - 2 - i)) { '?' }

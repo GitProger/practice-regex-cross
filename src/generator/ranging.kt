@@ -6,6 +6,7 @@ import kotlin.math.*
 fun Int.pow(p: Double): Int {
     return this.toDouble().pow(p).toInt()
 }
+
 /**
  * Файл реализует получение "хорошести" строки
  * Что же такое "хорошесть"?
@@ -26,7 +27,7 @@ enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
 fun getCost(p: PatternType, pattern: String) = when (p) {
     PatternType.PROGRESS -> {
-        3 * pattern.length.pow(1.5)
+        3 * pattern.length.pow(2.0)
         0
     }
     PatternType.REPEATS -> {
@@ -41,15 +42,13 @@ fun getCost(p: PatternType, pattern: String) = when (p) {
                 break
             }
         }
-        2 * count.pow(1.5)
-        0
+        2 * count.pow(2.0)
     }
     PatternType.PALINDROME -> {
         3 * pattern.length.pow(2.0)
     }
     PatternType.WORD -> {
-		pattern.length.pow(2.0)
-        0
+		pattern.length.pow(3.0)
 	}
 }
 
@@ -93,6 +92,7 @@ val dictionary = File("src/generator/db/dict.txt").bufferedReader().readLines()
 fun inDict(s: String) = s in dictionary
 
 fun corresponds(pattern: String, p: PatternType) = when (p) {
+
     PatternType.PROGRESS -> {
         isProgression(pattern)
     }
