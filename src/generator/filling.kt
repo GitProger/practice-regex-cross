@@ -1,28 +1,39 @@
 package generator
 
-import generator.ranging.estimateCost
-import solver.BaseFigure
-import solver.BaseFigure.Cell
+import generator.ranging.FigureWithCost
+import solver.Figure
+import java.lang.Math.random
 import kotlin.math.*
 
 const val MAX_TEMPERATURE = 10_000
-const val Q: Double = 100000000.0
+const val Q: Double = 1e3
 
-fun generateBoard(f: BaseFigure, chars: List<Char>) {
-    val board = f.board
-    board.forEach { row -> row.indices.forEach { row[it] = chars.random() } }
+fun prepareBoard(f: Figure) {
+    f.setLines("RIGHT", listOf(0 to "GREETINGS".substring(0 until f.rowSize(0))))
+    val chars = ('A'..'Z').toList()
+    f.fillRandomly(chars)
+    generateBoard(FigureWithCost(f), chars)
+}
+
+private fun generateBoard(f: FigureWithCost, chars: List<Char>) {
     // simulated annealing
     for (temperature in MAX_TEMPERATURE downTo 1) {
-        val cell = board.indices.random().let { row -> Cell(row, board[row].indices.random()) }
-        val prevChar = board[cell.row][cell.col]
-        val oldCost = f.directions.sumOf { estimateCost(f.getLine(cell, it)) }
-        board[cell.row][cell.col] = chars.random()
-        val newCost = f.directions.sumOf { estimateCost(f.getLine(cell, it)) }
+        val cell = f.randomCell()
+        val prevChar = f[cell]
+        val oldCost = f.cost()
+        f[cell] = chars.random()
+        val newCost = f.cost()
 
-        if (oldCost < newCost) continue
-        //the probability definition should probably be changed
         val probability = exp(-(oldCost - newCost) * Q / temperature)
+        if (oldCost != newCost) {
+            println("$temperature: oldCost is $oldCost, newCost is $newCost")
+        }
+        if (oldCost < newCost || probability > random()) {
+            println("Changes accepted")
+            println(f.cost())
+            continue
+        }
         // revert changes
-        board[cell.row][cell.col] = prevChar
+        f[cell] = prevChar
     }
 }
