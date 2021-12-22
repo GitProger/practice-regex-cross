@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+echo "pulling..."
+git pull
+git add main.tex
+git commit -m "report update"
+git push
