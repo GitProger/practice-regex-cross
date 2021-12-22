@@ -13,20 +13,59 @@ abstract class Figure {
     abstract var regexps: MutableList<MutableList<Row>>
     abstract var board: MutableList<MutableList<Char>>
 
-    protected fun rowSize(row: Int) = board[row].size
+    fun rowSize(row: Int) = board[row].size
 
+    abstract fun setLine(cell: Cell, dir: String, line: String)
     abstract fun getLine(cell: Cell, dir: String): String
+    abstract fun getLines(dir: String): List<String>
 
-    fun solve() {
-        var progress = true
-        while (progress) {
-            progress = false
-            for (i in 0 until board.size)
-                for (j in 0 until rowSize(i))
-                    progress = process(Cell(i, j)) || progress
+    private val uncertainCells = mutableListOf<Cell>()
+
+    fun fillRandomly(chars: List<Char>) {
+        for (cell in uncertainCells) {
+            this[cell] = chars.random()
         }
     }
 
+    fun setLines(dir: String, lines: List<Pair<Int, String>>) {
+        hide()
+        val questions = getLines(dir)
+        for ((i, line) in lines) {
+            if (questions[i].length == line.length) setLine(transposeInverse(dir, Cell(i, 0)), dir, line)
+        }
+        uncertainCells.removeAll { this[it] != '?' }
+    }
+
+    fun randomCell() = uncertainCells.random()
+
+    private fun hide() {
+        uncertainCells.clear()
+        for (i in board.indices) {
+            for (j in board[i].indices) {
+                board[i][j] = '?'
+                uncertainCells.add(Cell(i, j))
+            }
+        }
+    }
+
+    /**
+     * Solves the crossword
+     */
+    fun solve() {
+        hide()
+        var progress = true
+        while (progress) {
+            progress = false
+            for (cell in uncertainCells) {
+                progress = process(cell) || progress
+            }
+        }
+    }
+
+    /**
+     * Filters the regexps that contain the cell.
+     * If the cell char is unique, it is set on the board and the cell is removed from uncertainCells
+     */
     private fun process(cell: Cell): Boolean {
         var progress = false
         val result = BitSet()
@@ -48,12 +87,15 @@ Letter at row ${cell.row} and column ${cell.col} can't be found."""
             val pos = transpose(directions[i], cell)
             progress = progress or regexps[i][pos.row].setChars(result, pos.col)
         }
-        if (result.cardinality() == 1)
-            board[cell.row][cell.col] = char(result.nextSetBit(0))
+        if (result.cardinality() == 1) {
+            this[cell] = char(result.nextSetBit(0))
+            uncertainCells.remove(cell)
+        }
         return progress
     }
 
-    protected abstract fun transpose(dir: String, cell: Cell): Cell
+    abstract fun transpose(dir: String, cell: Cell): Cell
+    abstract fun transposeInverse(dir: String, cell: Cell): Cell
 
     fun readFromFile(fileName: String) {
         val lines = mutableListOf<String>()
@@ -69,6 +111,12 @@ Letter at row ${cell.row} and column ${cell.col} can't be found."""
     }
 
     fun putToFile(fileName: String) = File(fileName).writeText(toString())
+
+    operator fun get(cell: Cell) = board[cell.row][cell.col]
+
+    operator fun set(cell: Cell, c: Char) {
+        board[cell.row][cell.col] = c
+    }
 }
 
 /*

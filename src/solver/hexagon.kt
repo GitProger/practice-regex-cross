@@ -14,14 +14,27 @@ class Hexagon(private val size: Int) : Figure() {
 
     override val directions = listOf("LEFT_UP", "RIGHT", "LEFT_DOWN")
 
+    override fun setLine(cell: Cell, dir: String, line: String) {
+        val row = transpose(dir, cell).row
+        val transposedIndices = board[row].indices
+        val indices = transposedIndices.map { transposeInverse(dir, Cell(row, it)) }
+        for ((char, c) in line.toList().zip(indices)) {
+            this[c] = char
+        }
+    }
+
     override fun getLine(cell: Cell, dir: String): String {
         val row = transpose(dir, cell).row
         val transposedIndices = board[row].indices
         val indices = transposedIndices.map { transposeInverse(dir, Cell(row, it)) }
-        return indices.map { board[it.row][it.col] }.joinToString("")
+        return indices.map { this[it] }.joinToString("")
     }
 
-    private fun transposeInverse(dir: String, cell: Cell) = transpose(
+    override fun getLines(dir: String): List<String> {
+        return (0 until 2 * size - 1).map { getLine(transposeInverse(dir, Cell(it, 0)), dir) }
+    }
+
+    override fun transposeInverse(dir: String, cell: Cell) = transpose(
         when (dir) {
             "RIGHT" -> "RIGHT"
             "LEFT_UP" -> "LEFT_DOWN"

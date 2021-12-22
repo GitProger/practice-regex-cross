@@ -1,36 +1,28 @@
 package generator
 
-import generator.ranging.estimateCost
+import generator.ranging.FigureWithCost
 import solver.Figure
-import solver.Figure.Cell
-import solver.rectangle.Rectangle
 import java.lang.Math.random
 import kotlin.math.*
 
 const val MAX_TEMPERATURE = 10_000
-const val Q: Double = 1e6
+const val Q: Double = 1e3
 
-fun computeCost(f: Rectangle): Int {
-    var ans = 0
-    for (i in f.board.indices) ans += estimateCost(f.getLine(Cell(i, 0), "RIGHT"))
-    for (i in f.board[0].indices) ans += estimateCost(f.getLine(Cell(0, i), "DOWN"))
-    return ans
+fun prepareBoard(f: Figure) {
+    f.setLines("RIGHT", listOf(0 to "GREETINGS".substring(0 until f.rowSize(0))))
+    val chars = ('A'..'Z').toList()
+    f.fillRandomly(chars)
+    generateBoard(FigureWithCost(f), chars)
 }
 
-fun generateBoard(f: Figure, chars: List<Char>) {
-    val board = f.board
-    for (row in board) {
-        for (i in row.indices) {
-            if (row[i] == '?') row[i] = chars.random()
-        }
-    }
+private fun generateBoard(f: FigureWithCost, chars: List<Char>) {
     // simulated annealing
     for (temperature in MAX_TEMPERATURE downTo 1) {
-        val cell = board.indices.random().let { row -> Cell(row, board[row].indices.random()) }
-        val prevChar = board[cell.row][cell.col]
-        val oldCost = f.directions.sumOf { estimateCost(f.getLine(cell, it)) }
-        board[cell.row][cell.col] = chars.random()
-        val newCost = f.directions.sumOf { estimateCost(f.getLine(cell, it)) }
+        val cell = f.randomCell()
+        val prevChar = f[cell]
+        val oldCost = f.cost()
+        f[cell] = chars.random()
+        val newCost = f.cost()
 
         val probability = exp(-(oldCost - newCost) * Q / temperature)
         if (oldCost != newCost) {
@@ -38,10 +30,10 @@ fun generateBoard(f: Figure, chars: List<Char>) {
         }
         if (oldCost < newCost || probability > random()) {
             println("Changes accepted")
-            println("New global cost is ${computeCost(f as Rectangle)}")
+            println(f.cost())
             continue
         }
         // revert changes
-        board[cell.row][cell.col] = prevChar
+        f[cell] = prevChar
     }
 }

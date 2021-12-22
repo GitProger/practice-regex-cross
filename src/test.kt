@@ -1,4 +1,4 @@
-import generator.generateBoard
+import generator.prepareBoard
 import solver.hexagon.*
 import solver.rectangle.*
 
@@ -18,13 +18,13 @@ fun generate() {
         print("Enter crossword height and width: ")
         val (h, w) = readLine()!!.split(' ').map { it.toInt() }
         val r = Rectangle(h, w)
-        generateBoard(r, ('A'..'Z').toList())
+        prepareBoard(r)
         println(r)
     } else if (type == "h") {
         print("Enter crossword size: ")
         val size = readLine()!!.toInt()
         val h = Hexagon(size)
-        generateBoard(h, ('A'..'Z').toList())
+        prepareBoard(h)
         println(h)
     }
 }
