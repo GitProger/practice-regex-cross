@@ -28,7 +28,7 @@ enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
 fun getCost(p: PatternType, pattern: String) = when (p) {
     PatternType.PROGRESS -> {
-        3 * pattern.length.pow(2.0)
+        pattern.length.pow(2.0)
     }
     PatternType.REPEATS -> {
         var count = 0
@@ -62,18 +62,8 @@ fun getCost(p: PatternType, pattern: String) = when (p) {
 fun allEqual(s: String) = s.all { it == s.first() }
 
 fun isProgression(s: String): Boolean {
-    // ABC AXBXCX XAXBXC - yes
-    // CBA - no
-    fun isStraight(s: String): Boolean {
-        for (i in 1 until s.length) {
-            if (s[i] - s[i - 1] != 1) return false
-        }
-        return s.length > 1
-    }
-
-    val odd = s.slice(1 until s.length step 2)
     val even = s.slice(s.indices step 2)
-    return isStraight(s) || (isStraight(odd) && allEqual(even)) || (isStraight(even) && allEqual(odd))
+    return allEqual(even)
 }
 
 fun isPalindrome(s: String) = s == s.reversed()
@@ -141,7 +131,6 @@ fun estimateCost(s: String, pt: PatternType): Int {
 class FigureWithCost(private val f: Figure) {
     inner class CostKeeper {
         private val costForPattern = IntArray(PatternType.values().size)
-        private val maxCostForPattern = IntArray(4) { f.rowSize(0).pow(3.5) }
 
         init {
             for (pt in PatternType.values()) {
@@ -152,7 +141,7 @@ class FigureWithCost(private val f: Figure) {
         }
 
         fun joinCosts(): Int {
-            val sorted = costForPattern.mapIndexed { index, cost -> minOf(cost, maxCostForPattern[index]) }.sorted()
+            val sorted = costForPattern.sorted()
             var ans = 0
             for (i in sorted.indices) ans += (sorted.size - i) * sorted[i]
             return ans
