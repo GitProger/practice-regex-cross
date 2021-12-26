@@ -3,6 +3,11 @@
 *.iml
 out
 gen
+# LaTex Output
+*.log
+*.aux
+*.gz
+*.toc
 
 ### Java template
 *.class
