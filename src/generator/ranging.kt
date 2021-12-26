@@ -28,7 +28,7 @@ enum class PatternType { PROGRESS, REPEATS, PALINDROME, WORD }
 
 fun getCost(p: PatternType, pattern: String) = when (p) {
     PatternType.PROGRESS -> {
-        pattern.length.pow(2.0)
+        pattern.length.pow(2.0) / 4
     }
     PatternType.REPEATS -> {
         var count = 0
@@ -60,10 +60,12 @@ fun getCost(p: PatternType, pattern: String) = when (p) {
  */
 
 fun allEqual(s: String) = s.all { it == s.first() }
+fun allDistinct(s: String) = s.toList().distinct().size == s.length
 
 fun isProgression(s: String): Boolean {
     val even = s.slice(s.indices step 2)
-    return allEqual(even)
+    val odd = s.slice(1 until s.length step 2)
+    return s.length % 2 == 1 && allEqual(even) && allDistinct(odd)
 }
 
 fun isPalindrome(s: String) = s == s.reversed()
