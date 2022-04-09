@@ -1,16 +1,16 @@
-package solver.hexagon
+package solver
 
-import solver.Figure
-import solver.row.*
 import kotlin.math.*
 import java.lang.IllegalArgumentException
 import java.lang.StringBuilder
 
 class Hexagon(private val size: Int) : Figure() {
-    override var regexps = MutableList(3) { MutableList(size * 2 - 1) { Row() } }
-    override var board = MutableList(size * 2 - 1) { i ->
-        MutableList(minOf(size + i, 3 * size - 2 - i)) { '?' }
+    override val regexps = List(3) { Array(size * 2 - 1) { "" } }
+    override val board = List(size * 2 - 1) { i ->
+        Array(minOf(size + i, 3 * size - 2 - i)) { '?' }
     }
+
+    override fun rowSize(dir: String, row: Int) = board[row].size
 
     override val directions = listOf("LEFT_UP", "RIGHT", "LEFT_DOWN")
 
@@ -47,7 +47,7 @@ class Hexagon(private val size: Int) : Figure() {
         "RIGHT" -> cell
         "LEFT_UP" -> {
             val i = cell.col + max(size - 1 - cell.row, 0)
-            val j = rowSize(i) - 1 - cell.row + max(size - 1 - i, 0)
+            val j = rowSize(dir, i) - 1 - cell.row + max(size - 1 - i, 0)
             Cell(i, j)
         }
         "LEFT_DOWN" -> {
@@ -62,11 +62,9 @@ class Hexagon(private val size: Int) : Figure() {
         val result = StringBuilder()
         val longest = 4 * size - 3
         for (i in 0 until board.size) {
-            val spaces = (longest - (2 * rowSize(i) - 1)) / 2
+            val spaces = (longest - (2 * board[i].size - 1)) / 2
             val text = " ".repeat(spaces) +
-                    (0 until rowSize(i)).toList()
-                        .map { board[i][it] }
-                        .joinToString(" ") +
+                    (0 until board[i].size).map { board[i][it] }.joinToString(" ") +
                     "\n"
             result.append(text)
         }

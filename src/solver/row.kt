@@ -23,7 +23,7 @@ class Row() {
                 if (regex[i] == '?') continue
                 if (regex[i] == '[') {
                     val curR = findClose(regex, i)
-                    letters.add(getFromBrackets(regex, i, curR).letters[0])
+                    letters.add(parseFromBrackets(regex, i, curR).letters[0])
                     i = curR - 1
                     continue
                 }
@@ -87,7 +87,7 @@ class Row() {
         return this
     }
 
-    fun multiplyConcatenatedWith(row: Row, size: Int): Row {
+    fun multiConcatenatedWith(row: Row, size: Int): Row {
         val result = Row()
         val leftCnt = words.size
         val rightCnt = row.words.size
@@ -122,7 +122,7 @@ class Row() {
         private fun isRepChar(c: Char) = c == '?' || c == '+' || c == '*'
         private fun isDigit(c: Char) = c in '0'..'9'
 
-        private fun findOpen(s: String, closing: Int): Int {
+        private fun findOpeningPair(s: String, closing: Int): Int {
             if (s[closing] != ']' && s[closing] != ')') return closing - isDigit(s[closing]).toInt() // back reference
             for (i in closing downTo 0) {
                 if (s[i] == if (s[closing] == ')') '(' else '[') return i
@@ -141,7 +141,7 @@ class Row() {
         /**
          * Supposes there are only ^ABC in regex and (regex[[l]] == '[' && regex[[r]] == ']')
          */
-        private fun getFromBrackets(regex: String, l: Int, r: Int): Word {
+        private fun parseFromBrackets(regex: String, l: Int, r: Int): Word {
             assert(regex[l] == '[')
             val word = Word()
             word.letters.add(BitSet())
@@ -162,7 +162,8 @@ class Row() {
             val result = Row()
             for (len in lengths) {
                 result.words.addAll(
-                        getFromRegex(regex, r, required_size - len).multiplyConcatenatedWith(row, required_size).words
+                    parseFromRegex(regex, r, required_size - len)
+                        .multiConcatenatedWith(row, required_size).words
                 )
             }
             return result
@@ -177,17 +178,17 @@ class Row() {
          *
          * -Supposes that AB..YZ and . are the only letter characters
          */
-        private fun getFromRegex(regex: String, r: Int, required_size: Int): Row {
+        private fun parseFromRegex(regex: String, r: Int, required_size: Int): Row {
             if (r == -1 && required_size == 0) return Row(Word())
             if (r <= -1 || required_size < 0) return Row()
             val memo = dp[required_size][r]
             if (memo != null) return memo
             val rep = getRepChar(regex, r)
-            return getFromRegexWithRep(regex, r - isRepChar(regex[r]).toInt(), rep, required_size)
+            return parseFromRegexWithRep(regex, r - isRepChar(regex[r]).toInt(), rep, required_size)
         }
 
-        private fun getFromRegexWithRep(regex: String, r: Int, rep: Char, required_size: Int): Row {
-            val mid = findOpen(regex, r)
+        private fun parseFromRegexWithRep(regex: String, r: Int, rep: Char, required_size: Int): Row {
+            val mid = findOpeningPair(regex, r)
             val result = Row()
             if (isDigit(regex[r])) { //back reference
                 if (rep == '+' || rep == '*') {
@@ -205,10 +206,10 @@ class Row() {
                 }
             }
             if (rep == '+' || rep == '?') {
-                result.append(getFromRegex(regex, r, required_size))
+                result.append(parseFromRegex(regex, r, required_size))
             }
             if (rep == '*' || rep == '?') {
-                result.append(getFromRegex(regex, mid - 1, required_size))
+                result.append(parseFromRegex(regex, mid - 1, required_size))
             }
             dp[required_size][r + isRepChar(rep).toInt()] = result
             return result
@@ -222,13 +223,13 @@ class Row() {
             }
 
             val groupL = regex.indices.filter { regex[it] == '(' }.getOrNull(group - 1)
-                    ?: throw IllegalStateException("Regex $regex doesn't contain ${group}${ending(group)} group in parentheses")
+                ?: throw IllegalStateException("Regex $regex doesn't contain ${group}${ending(group)} group in parentheses")
             val groupR = findClose(regex, groupL)
-            val temp = getFromParentheses(regex, groupL, groupR)
+            val temp = parseFromParentheses(regex, groupL, groupR)
             val lengths = temp.distinctLengths()
             val result = Row()
             for (len in lengths) {
-                val left = getFromRegex(regex, r, required_size - len)
+                val left = parseFromRegex(regex, r, required_size - len)
                 for (word in left.words) {
                     val expr = word.subExprs[group - 1]
                     if (expr.size != len) continue
@@ -246,7 +247,7 @@ class Row() {
          *
          * Supposes that there are only (|) and ?[^].ABC characters in regex
          */
-        private fun getFromParentheses(regex: String, l: Int, r: Int): Row {
+        private fun parseFromParentheses(regex: String, l: Int, r: Int): Row {
             assert(regex[l] == '(')
             val row = Row()
             var curL = l + 1
@@ -266,18 +267,18 @@ class Row() {
             throw IllegalStateException("Regex $regex doesn't contain pair for opening parenthesis at $l")
         }
 
-        fun fromRegex(regex: String, required_size: Int): Row {
+        fun parseFromRegex(regex: String, required_size: Int): Row {
             dp = MutableList<MutableList<Row?>>(required_size + 1) { MutableList(regex.length + 1) { null } }
             last = MutableList<Row?>(regex.length + 1) { null }
-            val ans = getFromRegex(regex, regex.lastIndex, required_size)
+            val ans = parseFromRegex(regex, regex.lastIndex, required_size)
             return ans
         }
 
         private fun getLast(regex: String, l: Int, r: Int): Row {
             if (last[r] != null) return last[r]!!
             last[r] = when {
-                regex[l] == '[' -> Row(getFromBrackets(regex, l, r))
-                regex[l] == '(' -> getFromParentheses(regex, l, r)
+                regex[l] == '[' -> Row(parseFromBrackets(regex, l, r))
+                regex[l] == '(' -> parseFromParentheses(regex, l, r)
                 else -> Row(Word(regex, l, r, 0))
             }
             return last[r]!!

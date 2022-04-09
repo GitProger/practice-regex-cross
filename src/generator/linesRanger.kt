@@ -1,4 +1,4 @@
-package generator.ranging
+package generator
 
 import solver.Figure
 import java.io.File
@@ -83,7 +83,7 @@ fun doesRepeat(s: String): Boolean {
     return false
 }
 
-val dictionary = File("src/generator/db/dict.txt").bufferedReader().readLines()
+val dictionary = File("src/generator/db/dict.txt").bufferedReader().readLines().toHashSet()
 
 fun inDict(s: String) = s in dictionary
 
@@ -109,11 +109,11 @@ fun cost(pattern: String, p: PatternType): Int {
 
 fun estimateCost(s: String): Int {
     val n = s.length
-    val dp = MutableList<Int>(n) { 0 }
-    for (i in 0 until n) {
+    val dp = MutableList<Int>(n + 1) { 0 }
+    for (i in 1..n) {
         for (j in 0 until i) {
             for (p in PatternType.values()) {
-                dp[i] = maxOf(dp[i], dp[j] + cost(s.subSequence(j, i + 1).toString(), p))
+                dp[i] = maxOf(dp[i], dp[j] + cost(s.substring(j until i), p))
             }
         }
     }
@@ -130,7 +130,7 @@ fun estimateCost(s: String, pt: PatternType): Int {
     return ans
 }
 
-class FigureWithCost(private val f: Figure) {
+class FigureCostKeeper(private val f: Figure) {
     inner class CostKeeper {
         private val costForPattern = IntArray(PatternType.values().size)
 
@@ -177,5 +177,4 @@ class FigureWithCost(private val f: Figure) {
     operator fun get(cell: Figure.Cell) = f[cell]
 
     fun cost() = costKeeper.joinCosts()
-    fun randomCell() = f.randomCell()
 }

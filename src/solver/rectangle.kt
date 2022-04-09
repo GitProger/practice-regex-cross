@@ -1,13 +1,12 @@
-package solver.rectangle
-
-import solver.Figure
-import solver.row.*
+package solver
 
 class Rectangle(private val height: Int, private val width: Int) : Figure() {
-    override var regexps = MutableList(2) {
-        MutableList(if (it == 0) height else width) { Row() }
+    override val regexps = List(2) {
+        Array(if (it == 0) height else width) { "" }
     }
-    override var board = MutableList(height) { MutableList(width) { '?' } }
+    override val board = List(height) { Array(width) { '?' } }
+
+    override fun rowSize(dir: String, row: Int) = if (dir == "RIGHT") width else height
 
     override val directions = listOf("RIGHT", "DOWN")
 
