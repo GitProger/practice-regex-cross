@@ -4,6 +4,7 @@ import solver.hasSolution
 import solver.Figure
 import java.lang.Math.random
 import kotlin.math.*
+import kotlin.text.*
 
 private const val MAX_TEMPERATURE = 10000
 private const val Q: Double = 1e3
@@ -105,6 +106,10 @@ fun generateRegexp(s: String): String {
             }
         }
     }
+
+    // TODO: add '?' and '|' and {x,y} after some random tokens, reduce '[]' amount
+    // Tokenize regex: A(B|CD).[GHJ]\1  ->  (full) -> {A}; {(B|CD) -> {B}; {(CD) -> C, D}}; {.}; {[GHJ]}; {\1 *ref }
+    //                                                      ^-------------------------------------------------/
 
     return final
 }
