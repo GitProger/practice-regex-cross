@@ -58,7 +58,13 @@ fun encodeChar(c: Char, other: String): String {
         val random = other.random()
         if (random !in s) s += random
     }
-    return if (s.length == 1) s else "[${s.shuffled()}]"
+    return (if (s.length == 1) s else "[${s.shuffled()}]")
+}
+
+fun encodeString(s: String): String {
+    var res = ""
+    for (c in s) res += encodeChar(c, s)
+    return res
 }
 
 fun generateRegexp(s: String): String {
@@ -66,14 +72,14 @@ fun generateRegexp(s: String): String {
     fun generate(s: String): String {
         val period = findPeriod(s)
         if (period != null) {
-            val r = generate(s.substring(0 until period))
+            val r = encodeString(s.substring(0 until period))
             if (r.length == 1 || r.enclosedInBrackets()) return r + "*+".random()
             if ('(' !in r) return "($r)" + "*+".random()
         }
         if (s.length > 2 && isPalindrome(s)) {
             return s.lowercase()
         }
-        return s.map { encodeChar(it, s.filter { it.isUpperCase() }) }.joinToString("")
+        return s.map { encodeChar(it, s.filter { it.isUpperCase() }) + (if (random() < 0.1) "?" else "") }.joinToString("")
     }
 
     var regex = ""
@@ -83,11 +89,12 @@ fun generateRegexp(s: String): String {
         if (random() < 0.1) {
             regex += generate(cur)
             cur = ""
+            if (random() < 0.1) regex += encodeChar(s.random(), s) + "?"
         }
     }
     if (cur.isNotEmpty()) regex += generate(cur)
-    val indexOfParentheses = HashMap<Char, Int>()
-    var currentIndex = 0
+    val indexOfParentheses = IntArray(Char.MAX_VALUE.toInt() + 1) { 0 }
+    var currentIndex = 1
     var final = ""
     for (i in regex.indices) {
         if (regex[i] == '(') currentIndex++
@@ -95,12 +102,12 @@ fun generateRegexp(s: String): String {
             final += regex[i]
             continue
         }
-        if (indexOfParentheses.containsKey(regex[i])) {
-            final += "\\${indexOfParentheses[regex[i]]}"
+        if (indexOfParentheses[regex[i].toInt()] != 0) {
+            final += "\\${indexOfParentheses[regex[i].toInt()]}"
         } else {
             if (regex.count { it == regex[i] } > 1) {
                 final += "(.)"
-                indexOfParentheses[regex[i]] = ++currentIndex
+                indexOfParentheses[regex[i].toInt()] = currentIndex++
             } else {
                 final += "${regex[i].uppercaseChar()}"
             }

@@ -1,6 +1,6 @@
 package generator
 
-import kotlin.math.*;
+import kotlin.math.*
 
 fun letters(regex: String): Int {
     var r = regex.count { it in 'A'..'Z' }
@@ -9,7 +9,7 @@ fun letters(regex: String): Int {
     return r
 }
 
-fun encourage(level: Int, key: Int): Int { // we should ban to many same tokens
+fun encourage(level: Int, key: Int): Int { // we should ban too many same tokens
     return if (level < key) level else if (level < 11 * key / 10 + 2) key else 2 * key - level 
 }
 
