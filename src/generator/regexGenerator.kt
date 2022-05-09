@@ -114,7 +114,7 @@ fun generateRegexp(s: String): String {
         }
     }
 
-    // TODO: add '?' and '|' and {x,y} after some random tokens, reduce '[]' amount
+    // TODO: add '|', add {x,y} after some random tokens, reduce '[]' amount
     // Tokenize regex: A(B|CD).[GHJ]\1  ->  (full) -> {A}; {(B|CD) -> {B}; {(CD) -> C, D}}; {.}; {[GHJ]}; {\1 *ref }
     //                                                      ^-------------------------------------------------/
 
