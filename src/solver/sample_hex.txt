@@ -1,47 +1,46 @@
-.?RE..[IN]N.
-E?B?NE.V..E?
-LT[IL]E.E.?HB?..
-D[EL]?.BE?.?.O.?.A?
-.T.EG[ER]G(.)G\1L.
-D?AN?[EP]W[BR].RL?R(.)R\1
-G?.G.T(.)G\1I?[EG][DI]G.I.
-L[NB]?LBL?(B.)*GU[LPG]PG?.?
-YGD..GD.?DG.I[MI].
-A[IL][IRL]?R?.R[LR].?RL?.[RE].P
-...GD[DG]?D?AG?.[ID]D.
-(.)I\1U?..GZ.?L[UL].
-.[EG]DG.?EV[RDO].?.?
-[JL]..?.?..?.OT
-.HAA.?PUR
 
-.[PUE].P?E.?(.)T\1
-V..A[DU]UU[OUV]?.?
-(P[IP])*P?EILO.?P?
-.RE.[AD].D.?V.[HV]
-..[LP]?G..LA.E.A?
-P?Y?[GDA]RD?.[RD][RA][GD]GD?RA
-EH[GJ]?.?[HJL]G(..)+.?G[LJ].?
-G[GN]?.OA.DB[OD].?..?DY[PAD]
-[GN]E..?GP?G(.)(.)\1\2\1\2\1
-IVEB[RB](B[DB])*.[JD][RI].
-TOB?.G..?(.)(.)\1\2\1
-EEE.[EP]?E?[EI]B..?.
-[AE]N.L....?.A
-R?.T[EA]T[AT]WN?Y?
-..?L[GL]?.[DG].G[LG]?
 
-P.?J.?PA..
-[HNI]Y.?IG?I..[GY]?G
-AJ.?.[DA]L.[AWJ]?L.[DW]
-.[GR].U.[GRU]?...A[BG]
-HJ?D(.)D\1D[LD]E?NT?D
-.G?Y.GG..[BL][BT].L?.L
-.?LV.?.L..D..[DLZ]T?E
-R[ROA]?OG[AB].G[BG]..(.)(.)I\2\1
-T[UD]..[LU].LDP.?E.?[NR]R
-[RI]U.(.)(.)\2\2\1.BBE?.
-E..D?U[LDE].AC?(.)O\1U?
-P[AG][RI]LG[LR]?G?O(.)V\1
-.[MJA]P.?P.JHE.
-UGIR.Y?[LH]N*
-(.)V\1AAP.G
+.*H.*H.*  
+(DI|NS|TH|OM)* 
+F.*[AO].*[AO].* 
+(O|RHH|MM)* 
+.*  
+C*MC(CCC|MM)* 
+[^C]*[^R]*III.* 
+(...?)\1* 
+([^X]|XCC)*
+(RR|HHH)*.?
+N.*X.X.X.*E 
+R*D*M* 
+.(C|HH)* 
+ .*SE.*UE.*
+ .*LR.*RL.*
+ .*OXR.*
+ ([^EMC]|EM)*
+ (HHX|[^HX])*
+ .*PRR.*DDC.*
+ .*
+ [AM]*CM(RC)*R?
+ ([^MC]|MM|CC)*
+ (E|CR|MN)*
+ P+(..)\1.*
+ [CHMNOR]*I[CHMNOR]*
+ (ND|ET|IN)[^X]*
+
+
+ 
+ 
+
+.*G.*V.*H.*
+[CR]*
+.*XEXM*
+.*DD.*CCM.*
+.*XHCR.*X.*
+.*(.)(.)(.)(.)\4\3\2\1.*
+.*(IN|SE|HI)
+[^C]*MMM[^C]*
+.*(.)C\1X\1.*
+[CEIMU]*OH[AEMOR]*
+(RX|[^R])* 
+[^M]*M[^M]*
+(S|MM|HHH)*
