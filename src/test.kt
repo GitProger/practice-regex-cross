@@ -2,6 +2,7 @@ import generator.createBoard
 import generator.createRegexps
 import solver.Hexagon
 import solver.Rectangle
+import solver.Solver
 import solver.hasSolution
 
 fun main() {
@@ -22,16 +23,34 @@ fun generate() {
         val figure = Rectangle(h, w)
         createBoard(figure)
         createRegexps(figure)
+        val times = 100 // to calculate average
+        val difficulty = List(times) {
+            Solver(figure).run {
+                clear()
+                solve()
+                iterations
+            }
+        }.average()
         println(figure)
         println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
+        println("Approximate difficulty is $difficulty")
     } else if (type == "h") {
         print("Enter crossword size: ")
         val size = readLine()!!.toInt()
         val figure = Hexagon(size)
         createBoard(figure)
         createRegexps(figure)
+        val times = 100 // to calculate average
+        val difficulty = List(times) {
+            Solver(figure).run {
+                clear()
+                solve()
+                iterations
+            }
+        }.average()
         println(figure)
         println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
+        println("Approximate difficulty is $difficulty")
     }
 }
 
@@ -54,3 +73,5 @@ fun solve() {
         println(figure)
     }
 }
+
+fun List<Int>.average() = sumOf { it } * 1.0 / size

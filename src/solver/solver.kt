@@ -6,8 +6,10 @@ import solver.row.setAll
 import java.util.*
 
 fun hasSolution(figure: Figure) = try {
-    Solver(figure).solve()
-} catch(e: java.lang.IllegalStateException) {
+    Solver(figure).run {
+        solve()
+    }
+} catch (e: java.lang.IllegalStateException) {
     false // something went wrong, probably the regexps in [figure] are too difficult to parse
 }
 
@@ -21,20 +23,42 @@ class Solver(private val figure: Figure) {
         val uncertainCells = mutableListOf<Figure.Cell>()
         for (i in figure.board.indices) {
             for (j in figure.board[i].indices) {
-                if (figure.board[i][j] == '?') uncertainCells.add(Figure.Cell(i, j))
+                if (figure.board[i][j] == '?') uncertainCells.add(figure.Cell(i, j))
             }
         }
         uncertainCells.shuffle()
         return uncertainCells
     }
 
-    fun solve(): Boolean {
-        var progress = true
-        while (uncertainCells.isNotEmpty() && progress) {
-            progress = false
-            for (cell in uncertainCells.shuffled()) {
-                progress = progress or process(cell)
+    fun clear() {
+        val uncertainCells = mutableListOf<Figure.Cell>()
+        for (i in figure.board.indices) {
+            for (j in figure.board[i].indices) {
+                uncertainCells.add(figure.Cell(i, j))
+                figure.board[i][j] = '?'
             }
+        }
+        uncertainCells.shuffle()
+    }
+
+    var iterations = 0
+
+    fun solve(): Boolean {
+        if (uncertainCells.isEmpty()) return true
+        var progress = true
+        iterations = 0
+        val useful = BooleanArray(uncertainCells.maxOf { it.code() } + 1) { false }
+        for (cell in uncertainCells) useful[cell.code()] = true
+        while (uncertainCells.isNotEmpty() && useful.any { it }) {
+            progress = false
+            val cell = uncertainCells.random()
+            if (process(cell)) {
+                useful.fill(false)
+                for (c in uncertainCells) useful[c.code()] = true
+            } else {
+                useful[cell.code()] = false
+            }
+            iterations++
         }
         return uncertainCells.isEmpty()
     }

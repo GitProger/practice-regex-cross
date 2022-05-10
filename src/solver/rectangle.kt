@@ -54,4 +54,12 @@ class Rectangle(private val height: Int, private val width: Int) : Figure() {
         }
         return s
     }
+
+    override fun clone(): Figure {
+        val r = Rectangle(height, width)
+        for (i in r.regexps.indices) {
+            for (j in r.regexps[i].indices) r.regexps[i][j] = regexps[i][j]
+        }
+        return r
+    }
 }

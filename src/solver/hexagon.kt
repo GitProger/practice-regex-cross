@@ -70,4 +70,12 @@ class Hexagon(private val size: Int) : Figure() {
         }
         return result.toString()
     }
+
+    override fun clone(): Figure {
+        val h = Hexagon(size)
+        for (i in h.regexps.indices) {
+            for (j in h.regexps[i].indices) h.regexps[i][j] = regexps[i][j]
+        }
+        return h
+    }
 }

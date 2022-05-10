@@ -12,11 +12,11 @@ fun setLines(figure: Figure, dir: String, lines: List<Pair<Int, String>>) {
     }
     val questions = figure.getLines(dir)
     for (i in questions.indices) {
-        figure.setLine(figure.transposeInverse(dir, Figure.Cell(i, 0)), dir, questions[i].replace(".".toRegex(), "?"))
+        figure.setLine(figure.transposeInverse(dir, figure.Cell(i, 0)), dir, questions[i].replace(".".toRegex(), "?"))
     }
     for ((i, line) in lines) {
         if (questions[i].length == line.length) {
-            figure.setLine(figure.transposeInverse(dir, Figure.Cell(i, 0)), dir, line)
+            figure.setLine(figure.transposeInverse(dir, figure.Cell(i, 0)), dir, line)
         }
     }
 }
@@ -36,7 +36,7 @@ private fun generateBoard(figure: Figure, chars: List<Char>) {
         for (j in 0 until figure.board[i].size) {
             if (figure.board[i][j] == '?') {
                 figure.board[i][j] = chars.random()
-                space.add(Figure.Cell(i, j))
+                space.add(figure.Cell(i, j))
             }
         }
     }
@@ -51,13 +51,13 @@ private fun generateBoard(figure: Figure, chars: List<Char>) {
 
         val probability = exp(-(oldCost - newCost) * Q / temperature)
         if (oldCost != newCost) {
-            println("$temperature: oldCost is $oldCost, newCost is $newCost")
+//            println("$temperature: oldCost is $oldCost, newCost is $newCost")
         }
         // todo: draw plot of changing cost;
         // todo: experiment wih different probability functions based on the plot
         if (oldCost < newCost || probability > Math.random()) {
-            println("Changes accepted")
-            println(f.cost())
+//            println("Changes accepted")
+//            println(f.cost())
             continue
         }
         // revert changes

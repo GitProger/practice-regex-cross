@@ -5,7 +5,9 @@ import java.io.File
 abstract class Figure {
     abstract val directions: List<String>
 
-    data class Cell(var row: Int = 0, var col: Int = 0)
+    inner class Cell(var row: Int = 0, var col: Int = 0) {
+        fun code() = col * board.size + row
+    }
 
     abstract val regexps: List<Array<String>>
     abstract val board: List<Array<Char>>
@@ -39,4 +41,6 @@ abstract class Figure {
     operator fun set(cell: Cell, c: Char) {
         board[cell.row][cell.col] = c
     }
+
+    abstract fun clone(): Figure
 }

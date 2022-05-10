@@ -72,8 +72,12 @@ class Row() {
 
     fun setChars(allowed: BitSet, idx: Int): Boolean {
         var changed = false
-        for (word in words) changed = changed || (word.letters[idx] != allowed)
-        for (word in words) word.letters[idx].and(allowed)
+        for (word in words) {
+            val a = word.letters[idx].clone() as BitSet
+            a.and(allowed)
+            changed = changed || a.cardinality() < word.letters[idx].cardinality()
+            word.letters[idx] = a
+        }
         clean()
         return changed
     }

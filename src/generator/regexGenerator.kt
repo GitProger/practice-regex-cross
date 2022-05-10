@@ -29,14 +29,14 @@ fun createRegexps(f: Figure) {
         val newCost = estimateCostRegex(newRegexp)
         f.regexps[dir][index] = newRegexp
         val probability = exp(-(oldCost - newCost) * Q / temperature)
-        if ((oldCost > newCost && probability < random()) || !hasSolution(f)) {
+        if ((oldCost > newCost && probability < random()) || !hasSolution(f.clone())) {
             // revert changes
             f.regexps[dir][index] = oldRegexp
             continue
         }
         // todo: draw plot of changing cost
         // todo: experiment wih different probability functions based on the plot
-        println("Changes accepted")
+//        println("Changes accepted")
     }
 }
 
@@ -93,7 +93,7 @@ fun generateRegexp(s: String): String {
         }
     }
     if (cur.isNotEmpty()) regex += generate(cur)
-    val indexOfParentheses = IntArray(Char.MAX_VALUE.toInt() + 1) { 0 }
+    val indexOfParentheses = IntArray(Char.MAX_VALUE.code + 1) { 0 }
     var currentIndex = 1
     var final = ""
     for (i in regex.indices) {
@@ -102,12 +102,12 @@ fun generateRegexp(s: String): String {
             final += regex[i]
             continue
         }
-        if (indexOfParentheses[regex[i].toInt()] != 0) {
-            final += "\\${indexOfParentheses[regex[i].toInt()]}"
+        if (indexOfParentheses[regex[i].code] != 0) {
+            final += "\\${indexOfParentheses[regex[i].code]}"
         } else {
             if (regex.count { it == regex[i] } > 1) {
                 final += "(.)"
-                indexOfParentheses[regex[i].toInt()] = currentIndex++
+                indexOfParentheses[regex[i].code] = currentIndex++
             } else {
                 final += "${regex[i].uppercaseChar()}"
             }
