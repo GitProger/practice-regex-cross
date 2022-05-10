@@ -3,23 +3,38 @@ import generator.createRegexps
 import solver.*
 
 fun main() {
-    search()
-    return
     println("Do you want to solve any crossword or to create one?")
-    print("s - solve, g - generate >")
+    print("s - solve, g - generate, e - explore (generate many and choose the most and the less difficult) > ")
     when (readLine()!!.trim()) {
         "s" -> solve()
         "g" -> generate()
+        "e" -> explore()
     }
 }
 
-fun search() {
+fun explore() {
+    print("r - rect, h - hex >")
+    val sample = when (readLine()!!) {
+        "r" -> {
+            print("Enter crossword height and width: ")
+            val (h, w) = readLine()!!.split(' ').map { it.toInt() }
+            Rectangle(h, w)
+        }
+        "h" -> {
+            print("Enter crossword size: ")
+            val size = readLine()!!.toInt()
+            Hexagon(size)
+        }
+        else -> return
+    }
+
     var maxFigure: Figure? = null
     var maxDifficulty = 0.0
     var minFigure: Figure? = null
-    var minDifficulty = 1000.0
-    repeat(3) {
-        val figure = Hexagon(8)
+    var minDifficulty = Double.MAX_VALUE
+    print("How many figures do you want to try? ")
+    repeat(readLine()!!.toInt()) {
+        val figure = sample.clone()
         createBoard(figure)
         createRegexps(figure)
         val difficulty = Solver(figure).difficulty()
@@ -31,9 +46,6 @@ fun search() {
             minDifficulty = difficulty
             minFigure = figure.clone()
         }
-//        println(figure)
-//        println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
-//        println("Approximate difficulty is $difficulty")
     }
 
     println("Minimum difficulty is $minDifficulty")
@@ -51,27 +63,25 @@ fun search() {
 fun generate() {
     print("r - rect, h - hex >")
     val type = readLine()!!
-    if (type == "r") {
-        print("Enter crossword height and width: ")
-        val (h, w) = readLine()!!.split(' ').map { it.toInt() }
-        val figure = Rectangle(h, w)
-        createBoard(figure)
-        createRegexps(figure)
-        val difficulty = Solver(figure).difficulty()
-        println(figure)
-        println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
-        println("Approximate difficulty is $difficulty")
-    } else if (type == "h") {
-        print("Enter crossword size: ")
-        val size = readLine()!!.toInt()
-        val figure = Hexagon(size)
-        createBoard(figure)
-        createRegexps(figure)
-        val difficulty = Solver(figure).difficulty()
-        println(figure)
-        println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
-        println("Approximate difficulty is $difficulty")
+    val figure: Figure = when (type) {
+        "r" -> {
+            print("Enter crossword height and width: ")
+            val (h, w) = readLine()!!.split(' ').map { it.toInt() }
+            Rectangle(h, w)
+        }
+        "h" -> {
+            print("Enter crossword size: ")
+            val size = readLine()!!.toInt()
+            Hexagon(size)
+        }
+        else -> return
     }
+    createBoard(figure)
+    createRegexps(figure)
+    val difficulty = Solver(figure).difficulty()
+    println(figure)
+    println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
+    println("Approximate difficulty is $difficulty")
 }
 
 fun solve() {
@@ -91,5 +101,7 @@ fun solve() {
         figure.readFromFile("src/solver/sample_hex.txt")
         if (hasSolution(figure)) println("Success") else println("Fail")
         println(figure)
+        println("The approximate difficulty is ${Solver(figure).difficulty()}")
+        println("The approximate difficulty with human factor is ${Solver(figure).difficulty(true)}")
     }
 }

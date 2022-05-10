@@ -123,6 +123,8 @@ class Row() {
         private var dp = HashMap<Pair<Int, String>, Row>()
         private var last = mutableListOf<Row?>()
 
+        fun clearCaches() = dp.clear()
+
         private fun getRepChar(regex: String, i: Int) = if (isRepChar(regex[i])) regex[i] else '1'
         private fun isRepChar(c: Char) = c == '?' || c == '+' || c == '*'
         private fun isDigit(c: Char) = c in '0'..'9'

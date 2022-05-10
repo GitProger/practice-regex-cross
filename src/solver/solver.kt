@@ -40,7 +40,7 @@ class Solver(private val figure: Figure) {
 
     var iterations = 0
 
-    fun solve(): Boolean {
+    fun solve(humanFactor: Boolean = false): Boolean {
         if (uncertainCells.isEmpty()) return true
         iterations = 0
         val useful = BooleanArray(uncertainCells.maxOf { it.code() } + 1) { false }
@@ -48,7 +48,7 @@ class Solver(private val figure: Figure) {
         try {
             while (uncertainCells.isNotEmpty() && useful.any { it }) {
                 val cell = uncertainCells.random()
-                if (process(cell)) {
+                if (process(cell, humanFactor)) {
                     useful.fill(false)
                     for (c in uncertainCells) useful[c.code()] = true
                 } else {
@@ -68,7 +68,7 @@ class Solver(private val figure: Figure) {
      * Filters the regexps that contain the cell.
      * If the cell char is unique, it is set on the board and the cell is removed from uncertainCells
      */
-    private fun process(cell: Figure.Cell): Boolean {
+    private fun process(cell: Figure.Cell, humanFactor: Boolean): Boolean {
         var progress = false
         val result = BitSet()
         result.setAll()
@@ -77,6 +77,7 @@ class Solver(private val figure: Figure) {
             val charOr = rowRegexps[i][pos.row].charOr(pos.col)
             result.and(charOr)
         }
+        if (humanFactor && result.cardinality() >= 2) return false
         if (result.cardinality() == 0) {
             throw IllegalStateException(
                 """The crossword doesn't have any solution.
@@ -96,12 +97,12 @@ Letter at row ${cell.row} and column ${cell.col} can't be found."""
         return progress
     }
 
-    fun difficulty(): Double {
+    fun difficulty(humanFactor: Boolean = false): Double {
         var sum = 0.0
         val times = 10
         repeat(times) {
             clear()
-            if (!solve()) return 0.0
+            if (!solve(humanFactor)) return 0.0
             sum += iterations
         }
         return sum / times

@@ -3,6 +3,7 @@ package generator
 import solver.hasSolution
 import solver.Figure
 import solver.Solver
+import solver.row.Row
 import java.lang.Math.random
 import kotlin.math.*
 import kotlin.text.*
@@ -42,6 +43,7 @@ fun createRegexps(f: Figure) {
         // todo: experiment wih different probability functions based on the plot
 //        println("Changes accepted")
     }
+    Row.clearCaches()
 }
 
 fun findPeriod(s: String): Int? {
