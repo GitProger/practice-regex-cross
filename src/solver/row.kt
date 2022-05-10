@@ -77,7 +77,7 @@ class Row() {
             val a = word.letters[idx].clone() as BitSet
             a.and(allowed)
             changed = changed || a.cardinality() < word.letters[idx].cardinality()
-            word.letters[idx] = a
+            word.letters[idx].and(a)
         }
         clean()
         return changed

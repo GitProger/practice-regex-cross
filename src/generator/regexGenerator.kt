@@ -28,10 +28,10 @@ fun createRegexps(f: Figure) {
         val index = f.regexps[dir].indices.random()
         val newRegexp = generateRegexp(f.getLines(f.directions[dir])[index])
         val oldRegexp = f.regexps[dir][index]
-        val oldCost = estimateCostRegex(oldRegexp) + 5 * difficulty
+        val oldCost = estimateCostRegex(oldRegexp) + 1 * difficulty
         f.regexps[dir][index] = newRegexp
         val newDifficulty = Solver(f.clone()).difficulty()
-        val newCost = estimateCostRegex(newRegexp) + 5 * newDifficulty
+        val newCost = estimateCostRegex(newRegexp) + 1 * newDifficulty
         val probability = exp(-(oldCost - newCost) * Q / temperature)
         if ((oldCost > newCost && probability < random()) || !hasSolution(f.clone())) {
             // revert changes
