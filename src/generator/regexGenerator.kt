@@ -2,6 +2,7 @@ package generator
 
 import solver.hasSolution
 import solver.Figure
+import solver.Solver
 import java.lang.Math.random
 import kotlin.math.*
 import kotlin.text.*
@@ -20,20 +21,23 @@ fun createRegexps(f: Figure) {
         }
     }
     // simulated annealing
+    var difficulty = 0.0
     for (temperature in MAX_TEMPERATURE downTo 1) {
         val dir = f.directions.indices.random()
         val index = f.regexps[dir].indices.random()
         val newRegexp = generateRegexp(f.getLines(f.directions[dir])[index])
         val oldRegexp = f.regexps[dir][index]
-        val oldCost = estimateCostRegex(oldRegexp)
-        val newCost = estimateCostRegex(newRegexp)
+        val oldCost = estimateCostRegex(oldRegexp) + 5 * difficulty
         f.regexps[dir][index] = newRegexp
+        val newDifficulty = Solver(f.clone()).difficulty()
+        val newCost = estimateCostRegex(newRegexp) + 5 * newDifficulty
         val probability = exp(-(oldCost - newCost) * Q / temperature)
         if ((oldCost > newCost && probability < random()) || !hasSolution(f.clone())) {
             // revert changes
             f.regexps[dir][index] = oldRegexp
             continue
         }
+        difficulty = newDifficulty
         // todo: draw plot of changing cost
         // todo: experiment wih different probability functions based on the plot
 //        println("Changes accepted")

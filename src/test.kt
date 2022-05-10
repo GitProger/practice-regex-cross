@@ -3,7 +3,7 @@ import generator.createRegexps
 import solver.*
 
 fun main() {
-    mine()
+    search()
     return
     println("Do you want to solve any crossword or to create one?")
     print("s - solve, g - generate >")
@@ -13,7 +13,7 @@ fun main() {
     }
 }
 
-fun mine(){
+fun search() {
     var maxFigure: Figure? = null
     var maxDifficulty = 0.0
     var minFigure: Figure? = null
@@ -22,14 +22,7 @@ fun mine(){
         val figure = Hexagon(8)
         createBoard(figure)
         createRegexps(figure)
-        val times = 100 // to calculate average
-        val difficulty = List(times) {
-            Solver(figure).run {
-                clear()
-                solve()
-                iterations
-            }
-        }.average()
+        val difficulty = Solver(figure).difficulty()
         if (difficulty > maxDifficulty) {
             maxDifficulty = difficulty
             maxFigure = figure.clone()
@@ -43,13 +36,13 @@ fun mine(){
 //        println("Approximate difficulty is $difficulty")
     }
 
-    println("Minimum difficulty is ${minDifficulty}")
+    println("Minimum difficulty is $minDifficulty")
     Solver(minFigure!!).solve()
     println(minFigure)
     println(minFigure!!.regexps.joinToString("\n\n") { it.joinToString("\n") })
     println()
     println()
-    println("Maximum difficulty is ${maxDifficulty}")
+    println("Maximum difficulty is $maxDifficulty")
     Solver(maxFigure!!).solve()
     println(maxFigure)
     println(maxFigure!!.regexps.joinToString("\n\n") { it.joinToString("\n") })
@@ -64,14 +57,7 @@ fun generate() {
         val figure = Rectangle(h, w)
         createBoard(figure)
         createRegexps(figure)
-        val times = 100 // to calculate average
-        val difficulty = List(times) {
-            Solver(figure).run {
-                clear()
-                solve()
-                iterations
-            }
-        }.average()
+        val difficulty = Solver(figure).difficulty()
         println(figure)
         println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
         println("Approximate difficulty is $difficulty")
@@ -81,14 +67,7 @@ fun generate() {
         val figure = Hexagon(size)
         createBoard(figure)
         createRegexps(figure)
-        val times = 100 // to calculate average
-        val difficulty = List(times) {
-            Solver(figure).run {
-                clear()
-                solve()
-                iterations
-            }
-        }.average()
+        val difficulty = Solver(figure).difficulty()
         println(figure)
         println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
         println("Approximate difficulty is $difficulty")
@@ -114,5 +93,3 @@ fun solve() {
         println(figure)
     }
 }
-
-fun List<Int>.average() = sumOf { it } * 1.0 / size

@@ -5,17 +5,11 @@ import solver.row.char
 import solver.row.setAll
 import java.util.*
 
-fun hasSolution(figure: Figure) = try {
-    Solver(figure).run {
-        solve()
-    }
-} catch (e: java.lang.IllegalStateException) {
-    false // something went wrong, probably the regexps in [figure] are too difficult to parse
-}
+fun hasSolution(figure: Figure) = Solver(figure).solve()
 
 class Solver(private val figure: Figure) {
-    private val uncertainCells: MutableList<Figure.Cell> = findUncertainCells()
-    private val rowRegexps: List<List<Row>> = figure.regexps.mapIndexed { dir, list ->
+    private var uncertainCells: MutableList<Figure.Cell> = findUncertainCells()
+    private var rowRegexps: List<List<Row>> = figure.regexps.mapIndexed { dir, list ->
         list.mapIndexed { idx, regex -> Row.parseFromRegex(regex, figure.rowSize(figure.directions[dir], idx)) }
     }
 
@@ -31,7 +25,7 @@ class Solver(private val figure: Figure) {
     }
 
     fun clear() {
-        val uncertainCells = mutableListOf<Figure.Cell>()
+        uncertainCells = mutableListOf<Figure.Cell>()
         for (i in figure.board.indices) {
             for (j in figure.board[i].indices) {
                 uncertainCells.add(figure.Cell(i, j))
@@ -39,26 +33,33 @@ class Solver(private val figure: Figure) {
             }
         }
         uncertainCells.shuffle()
+        rowRegexps = figure.regexps.mapIndexed { dir, list ->
+            list.mapIndexed { idx, regex -> Row.parseFromRegex(regex, figure.rowSize(figure.directions[dir], idx)) }
+        }
     }
 
     var iterations = 0
 
     fun solve(): Boolean {
         if (uncertainCells.isEmpty()) return true
-        var progress = true
         iterations = 0
         val useful = BooleanArray(uncertainCells.maxOf { it.code() } + 1) { false }
         for (cell in uncertainCells) useful[cell.code()] = true
-        while (uncertainCells.isNotEmpty() && useful.any { it }) {
-            progress = false
-            val cell = uncertainCells.random()
-            if (process(cell)) {
-                useful.fill(false)
-                for (c in uncertainCells) useful[c.code()] = true
-            } else {
-                useful[cell.code()] = false
+        try {
+            while (uncertainCells.isNotEmpty() && useful.any { it }) {
+                val cell = uncertainCells.random()
+                if (process(cell)) {
+                    useful.fill(false)
+                    for (c in uncertainCells) useful[c.code()] = true
+                } else {
+                    useful[cell.code()] = false
+                }
+                iterations++
             }
-            iterations++
+        } catch (e: java.lang.IllegalStateException) {
+            return false
+            // something went wrong, probably the regexps in [figure] are too difficult to parse
+            // or the crossword doesn't any have solution
         }
         return uncertainCells.isEmpty()
     }
@@ -93,5 +94,16 @@ Letter at row ${cell.row} and column ${cell.col} can't be found."""
             uncertainCells.remove(cell)
         }
         return progress
+    }
+
+    fun difficulty(): Double {
+        var sum = 0.0
+        val times = 10
+        repeat(times) {
+            clear()
+            if (!solve()) return 0.0
+            sum += iterations
+        }
+        return sum / times
     }
 }

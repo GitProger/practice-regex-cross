@@ -1,6 +1,7 @@
 package solver.row
 
 import java.util.*
+import kotlin.collections.HashMap
 
 private fun Boolean.toInt() = if (this) 1 else 0
 const val alphabet = 26
@@ -119,7 +120,7 @@ class Row() {
     fun distinctLengths() = List(words.size) { words[it].size }.sorted().distinct()
 
     companion object Getter {
-        private var dp = mutableListOf<MutableList<Row?>>()
+        private var dp = HashMap<Pair<Int, String>, Row>()
         private var last = mutableListOf<Row?>()
 
         private fun getRepChar(regex: String, i: Int) = if (isRepChar(regex[i])) regex[i] else '1'
@@ -185,7 +186,7 @@ class Row() {
         private fun parseFromRegex(regex: String, r: Int, required_size: Int): Row {
             if (r == -1 && required_size == 0) return Row(Word())
             if (r <= -1 || required_size < 0) return Row()
-            val memo = dp[required_size][r]
+            val memo = dp[required_size to regex.slice(0..r)]
             if (memo != null) return memo
             val rep = getRepChar(regex, r)
             return parseFromRegexWithRep(regex, r - isRepChar(regex[r]).toInt(), rep, required_size)
@@ -215,7 +216,7 @@ class Row() {
             if (rep == '*' || rep == '?') {
                 result.append(parseFromRegex(regex, mid - 1, required_size))
             }
-            dp[required_size][r + isRepChar(rep).toInt()] = result
+            dp[required_size to regex.slice(0..r + isRepChar(rep).toInt())] = result
             return result
         }
 
@@ -272,9 +273,8 @@ class Row() {
         }
 
         fun parseFromRegex(regex: String, required_size: Int): Row {
-            dp = MutableList<MutableList<Row?>>(required_size + 1) { MutableList(regex.length + 1) { null } }
             last = MutableList<Row?>(regex.length + 1) { null }
-            val ans = parseFromRegex(regex, regex.lastIndex, required_size)
+            val ans = parseFromRegex(regex, regex.lastIndex, required_size).clone()
             return ans
         }
 
@@ -287,5 +287,11 @@ class Row() {
             }
             return last[r]!!
         }
+    }
+
+    fun clone(): Row {
+        val row = Row()
+        for (word in words) row.words.add(word.clone())
+        return row
     }
 }
