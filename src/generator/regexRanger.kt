@@ -30,7 +30,8 @@ fun tokens(regex: String): Int {
     r += 2 * regex.count { it == '?' }
     r += 2 * regex.count { it == '|' }
     r += br(regex)
-    r += regex.count { it == '*' || it == '+' || it == '.' }
+    r += regex.count {  it == '.' }
+    r += 10 * regex.count {  it == '+' || it == '*' }
     return r
 }
 

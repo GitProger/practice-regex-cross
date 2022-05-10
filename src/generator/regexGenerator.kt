@@ -73,8 +73,8 @@ fun generateRegexp(s: String): String {
         val period = findPeriod(s)
         if (period != null) {
             val r = encodeString(s.substring(0 until period))
-            if (r.length == 1 || r.enclosedInBrackets()) return r + "*+".random()
-            if ('(' !in r) return "($r)" + "*+".random()
+            if (r.length == 1 || r.enclosedInBrackets()) return "$r+"
+            if ('(' !in r) return "($r)+"
         }
         if (s.length > 2 && isPalindrome(s)) {
             return s.lowercase()
@@ -96,10 +96,11 @@ fun generateRegexp(s: String): String {
     val indexOfParentheses = IntArray(Char.MAX_VALUE.code + 1) { 0 }
     var currentIndex = 1
     var final = ""
+    val backReferences = regex.contains("[a-z]".toRegex())
     for (i in regex.indices) {
         if (regex[i] == '(') currentIndex++
         if (!regex[i].isLowerCase()) {
-            final += regex[i]
+            final += if (regex[i] == '+' && !backReferences) "*+".random() else regex[i]
             continue
         }
         if (indexOfParentheses[regex[i].code] != 0) {

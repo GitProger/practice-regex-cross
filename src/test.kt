@@ -1,17 +1,58 @@
 import generator.createBoard
 import generator.createRegexps
-import solver.Hexagon
-import solver.Rectangle
-import solver.Solver
-import solver.hasSolution
+import solver.*
 
 fun main() {
+    mine()
+    return
     println("Do you want to solve any crossword or to create one?")
     print("s - solve, g - generate >")
     when (readLine()!!.trim()) {
         "s" -> solve()
         "g" -> generate()
     }
+}
+
+fun mine(){
+    var maxFigure: Figure? = null
+    var maxDifficulty = 0.0
+    var minFigure: Figure? = null
+    var minDifficulty = 1000.0
+    repeat(3) {
+        val figure = Hexagon(8)
+        createBoard(figure)
+        createRegexps(figure)
+        val times = 100 // to calculate average
+        val difficulty = List(times) {
+            Solver(figure).run {
+                clear()
+                solve()
+                iterations
+            }
+        }.average()
+        if (difficulty > maxDifficulty) {
+            maxDifficulty = difficulty
+            maxFigure = figure.clone()
+        }
+        if (difficulty < minDifficulty) {
+            minDifficulty = difficulty
+            minFigure = figure.clone()
+        }
+//        println(figure)
+//        println(figure.regexps.joinToString("\n\n") { it.joinToString("\n") })
+//        println("Approximate difficulty is $difficulty")
+    }
+
+    println("Minimum difficulty is ${minDifficulty}")
+    Solver(minFigure!!).solve()
+    println(minFigure)
+    println(minFigure!!.regexps.joinToString("\n\n") { it.joinToString("\n") })
+    println()
+    println()
+    println("Maximum difficulty is ${maxDifficulty}")
+    Solver(maxFigure!!).solve()
+    println(maxFigure)
+    println(maxFigure!!.regexps.joinToString("\n\n") { it.joinToString("\n") })
 }
 
 fun generate() {
